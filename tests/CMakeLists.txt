@@ -1,7 +1,7 @@
-cmake_minimum_required(VERSION 3.13)
+cmake_minimum_required(VERSION 3.7)
 project(TKOMtests)
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 14)
 #boost
 enable_testing()
 find_package(Boost COMPONENTS unit_test_framework REQUIRED)
@@ -21,7 +21,5 @@ SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${GCC_COVERAGE_COMPILE_FLAGS}")
 SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${GCC_COVERAGE_LINK_FLAGS}")
 
 target_include_directories(tkom_tests PRIVATE ${Boost_INCLUDE_DIRS} PUBLIC ../include/)
-
-
 # declares a test with our executable
 add_test(NAME TKOMtests COMMAND tkom_tests)
