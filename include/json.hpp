@@ -6879,7 +6879,7 @@ scan_number_done:
     }
 
     /////////////////////
-    // actual scanner
+    // actual Scanner
     /////////////////////
 
     /*!
