@@ -30,12 +30,14 @@ enum class TokenType{
         NUMBER,
         TEXT,
         TYPE,
-        EOFT
+        EOFT,
+        START
     };
 
 class Token {
 public:
-    Token(TokenType t, std::string text_) : type{t}, text{text_}
+    //TODO: another constructor for constant text
+    Token(TokenType t, std::string text_) : type{t}, text{text_} //TODO: don't copy string
     {};
 
     TokenType getType() const{

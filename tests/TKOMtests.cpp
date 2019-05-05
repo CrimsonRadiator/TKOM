@@ -6,6 +6,7 @@
 
 #include "Source.h"
 #include "Scanner.h"
+#include "Parser.h"
 
 
 typedef std::pair<std::string, std::string> PSS;
@@ -86,6 +87,19 @@ public:
     FakeSource source;
     Scanner scanner;
     unsigned counter;
+};
+
+class P : public F{
+public:
+    P() : F(), parser{scanner} {};
+    Parser parser;
+
+    bool parse(){
+        while(parser.getCurrentToken().getType() != TokenType::EOFT){
+            return parser.root();
+        }
+        return true;
+    }
 };
 
 
@@ -344,5 +358,44 @@ BOOST_FIXTURE_TEST_SUITE(tkom_tests_suite, F)
         read(true);
         BOOST_TEST(resultTokens == testTokens, boost::test_tools::per_element());
     }
+
+BOOST_AUTO_TEST_SUITE_END()
+
+
+
+BOOST_FIXTURE_TEST_SUITE(parse_tests_suite, P)
+
+
+    BOOST_AUTO_TEST_CASE(parseTemplate) {
+        std::string text = "{{ token }}";
+        source.loadData(text);
+        BOOST_CHECK_EQUAL(parse(), true);
+    }
+
+    BOOST_AUTO_TEST_CASE(parseBadTemplate) {
+        std::string text = "{{ 1 = 1 }}";
+        source.loadData(text);
+        BOOST_CHECK_EQUAL(parse(), false);
+    }
+
+    BOOST_AUTO_TEST_CASE(parseText) {
+        std::string text = "{ 1 = 1 }}";
+        source.loadData(text);
+        BOOST_CHECK_EQUAL(parse(), true);
+    }
+
+    BOOST_AUTO_TEST_CASE(parseDefinition) {
+        std::string text = "{{ x = 1 }}";
+        source.loadData(text);
+        BOOST_CHECK_EQUAL(parse(), true);
+    }
+
+    BOOST_AUTO_TEST_CASE(parseStatement) {
+    
+    }
+}
+
+
+
 
 BOOST_AUTO_TEST_SUITE_END()

@@ -7004,7 +7004,7 @@ scan_number_done:
 }  // namespace detail
 }  // namespace nlohmann
 
-// #include <nlohmann/detail/input/parser.hpp>
+// #include <nlohmann/detail/input/Parser.hpp>
 
 
 #include <cassert> // assert
@@ -7035,7 +7035,7 @@ namespace nlohmann
 namespace detail
 {
 ////////////
-// parser //
+// Parser //
 ////////////
 
 /*!
@@ -13814,7 +13814,7 @@ class basic_json
 
   public:
     //////////////////////////
-    // JSON parser callback //
+    // JSON Parser callback //
     //////////////////////////
 
     /*!

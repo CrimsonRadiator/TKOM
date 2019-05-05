@@ -68,7 +68,7 @@ Token Scanner::extractToken() {
             return Token(TokenType::TEXT, text);
         }
         else {
-            text = text.substr(0, text.size()-1);
+            text = text.substr(0, text.size()-1); //TODO: no-copy way
             return Token(TokenType::TEXT, text);
         }
     }
@@ -109,7 +109,7 @@ Token Scanner::extractToken() {
             }
 
             //skip last char
-            text = text.substr(0, text.size()-1);
+            text = text.substr(0, text.size()-1); //TODO: no-copy way
 
 
             //check if keyword
@@ -138,7 +138,7 @@ Token Scanner::extractToken() {
             if(source.getCurr()==EOF)
                 return Token(TokenType::EOFT, "");
 
-            text = text.substr(0, text.size()-1);
+            text = text.substr(0, text.size()-1); //TODO: no-copy way
             return Token(TokenType::NUMBER, text);
         }
 
