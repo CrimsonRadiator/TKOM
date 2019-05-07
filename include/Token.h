@@ -6,6 +6,7 @@
 #include <memory>
 #include "Source.h"
 
+
 enum class TokenType{
         OPTEMPLATE,
         CLTEMPLATENEW,
@@ -49,7 +50,6 @@ public:
 private:
     TokenType type;
     std::string text;
-
 };
 
 

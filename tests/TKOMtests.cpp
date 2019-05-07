@@ -3,6 +3,7 @@
 #include <boost/test/included/unit_test.hpp>
 #include <sstream>
 #include <string>
+#include <Node.h>
 
 #include "Source.h"
 #include "Scanner.h"
@@ -94,15 +95,15 @@ public:
     P() : F(), parser{scanner} {};
     Parser parser;
 
-    bool parse(){
+    std::unique_ptr<Node> parse(){
         while(parser.getCurrentToken().getType() != TokenType::EOFT){
             return parser.root();
         }
-        return true;
+        return nullptr;
     }
 };
 
-
+/*
 BOOST_FIXTURE_TEST_SUITE(tkom_tests_suite, F)
 
 
@@ -361,41 +362,87 @@ BOOST_FIXTURE_TEST_SUITE(tkom_tests_suite, F)
 
 BOOST_AUTO_TEST_SUITE_END()
 
-
+*/
 
 BOOST_FIXTURE_TEST_SUITE(parse_tests_suite, P)
 
-
+/*
     BOOST_AUTO_TEST_CASE(parseTemplate) {
         std::string text = "{{ token }}";
         source.loadData(text);
-        BOOST_CHECK_EQUAL(parse(), true);
+        auto result = parser.root();
     }
 
     BOOST_AUTO_TEST_CASE(parseBadTemplate) {
-        std::string text = "{{ 1 = 1 }}";
+        std::string text = "{{ 1 == 1 }}";
         source.loadData(text);
-        BOOST_CHECK_EQUAL(parse(), false);
-    }
+        auto result = parser.root();
 
-    BOOST_AUTO_TEST_CASE(parseText) {
-        std::string text = "{ 1 = 1 }}";
+        BOOST_CHECK(true);
+    }
+*/
+
+    BOOST_AUTO_TEST_CASE(parseNumberDefinition) {
+        std::string text = "{{ int x = 1 }}";
         source.loadData(text);
-        BOOST_CHECK_EQUAL(parse(), true);
+        auto result = parser.root();
+
+        BOOST_CHECK(true);
     }
 
-    BOOST_AUTO_TEST_CASE(parseDefinition) {
-        std::string text = "{{ x = 1 }}";
+    BOOST_AUTO_TEST_CASE(parseVariableDefinition){
+        std::string text = "{{ bool x = y }}";
         source.loadData(text);
-        BOOST_CHECK_EQUAL(parse(), true);
+        auto result = parser.root();
+
+        BOOST_CHECK(true);
     }
 
-    BOOST_AUTO_TEST_CASE(parseStatement) {
-    
+    BOOST_AUTO_TEST_CASE(parseForLoop){
+        std::string text = "{{ for x in range }} TTTEEXXTT {{endfor}}";
+        source.loadData(text);
+        auto result = parser.root();
+
+        BOOST_CHECK(true);
+
     }
-}
 
+     BOOST_AUTO_TEST_CASE(parseWhileLoop){
+        std::string text = "{{ while x > 0 }} TTTEEXXTT {{endwhile}}";
+        source.loadData(text);
+        auto result = parser.root();
 
+        BOOST_CHECK(true);
+
+    }
+
+    BOOST_AUTO_TEST_CASE(parseIf){
+        std::string text = "{{ if x == true }} TTTEEXXTT {{endif}}";
+        source.loadData(text);
+        auto result = parser.root();
+
+        BOOST_CHECK(true);
+
+    }
+
+    BOOST_AUTO_TEST_CASE(parseIfElse){
+        std::string text = "{{ if x == true }} TTTEEXXTT {{else}} 222222 {{endelse}}";
+        source.loadData(text);
+        auto result = parser.root();
+
+        BOOST_CHECK(true);
+
+    }
+
+    BOOST_AUTO_TEST_CASE(parseTemplates){
+
+        std::string text = "{{ if x == true }}{{if y > 0}} 1111 {{endif}}{{else}} 222222 {{endelse}}";
+        source.loadData(text);
+        auto result = parser.root();
+
+        BOOST_CHECK(true);
+
+    }
 
 
 BOOST_AUTO_TEST_SUITE_END()

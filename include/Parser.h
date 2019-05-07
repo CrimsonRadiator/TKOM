@@ -11,26 +11,28 @@ class Parser {
 public:
     explicit Parser(const Scanner& scanner_) :
                             scanner{scanner_},
-                            currentToken{TokenType::START, ""}
+                            currentToken{TokenType::START, ""},
+                            previousToken{TokenType::START, ""}
     {}
 
     void nextSymbol();
-    bool accept(TokenType type);
-    bool accept(TokenType type, const std::string& val);
+    std::unique_ptr<Node> accept(TokenType type);
+    std::unique_ptr<Node> accept(TokenType type, const std::string& val);
 
-    bool segment();
-    bool root();
-    bool statement();
-    bool forExpr();
-    bool whileExpr();
-    bool ifExpr();
-    bool compoundLogicExpr();
-    bool compoundExpr();
-    bool expr();
-    bool declaration();
-    bool endTemplate();
-    bool idOrNumOrBool();
-    bool value();
+    std::unique_ptr<Node> segment();
+    std::unique_ptr<Node> root();
+    std::unique_ptr<Node> statement();
+    std::unique_ptr<Node> forExpr();
+    std::unique_ptr<Node> whileExpr();
+    std::unique_ptr<Node> ifExpr();
+    std::unique_ptr<Node> compoundLogicExpr();
+    std::unique_ptr<Node> compoundExpr();
+    std::unique_ptr<Node> expr();
+    std::unique_ptr<Node> declaration();
+    bool endTemplate(std::unique_ptr<Node>& t);
+    std::unique_ptr<Node> keyword(TokenType t);
+    std::unique_ptr<Node> keywordSkip(TokenType t);
+    std::unique_ptr<Node> value();
 
     Token getCurrentToken() const{
         return currentToken;
@@ -41,6 +43,7 @@ public:
 private:
     Scanner scanner;
     Token currentToken;
+    Token previousToken;
 };
 
 
