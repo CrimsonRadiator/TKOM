@@ -1,7 +1,5 @@
 #include "Parser.h"
 
-//FIX endTemplate(
-// )
 
 typedef TokenType TT;
 typedef NodeType NT;
@@ -36,6 +34,19 @@ NP Parser::root(){
     return root;
 }
 
+NP Parser::multipleSegments() {
+    auto segments = std::make_unique<Node>(Token(TT::START, ""));
+    segments->type = NT::MULTIPLE_SEGMENTS;
+
+    while(auto seg = segment()){
+        segments->add(seg);
+    }
+    if(segments->children.empty())
+        return nullptr;
+
+    return segments;
+}
+
 bool Parser::endTemplate(NP& t){
     auto result = accept(TT::CLTEMPLATENONEW);
     if(result) {
@@ -62,30 +73,59 @@ NP Parser::segment() {
         return seg;
     else if (seg = forExpr()) {
         seg->type = NT::FOR_LOOP;
-        auto body = segment();
+        auto body = multipleSegments();
+        if(!body)
+            return nullptr;
         seg->add(body);
         auto end = keyword(TT::ENDFOR);
+        if(!end) {
+            end = keywordSkip(TT::ENDFOR);
+            if(!end)
+                return nullptr;
+        }
         seg->add(end);
     } else if ((seg= whileExpr())) {
         seg->type = NT::WHILE_LOOP;
-        auto body = segment();
+        auto body = multipleSegments();
+        if(!body)
+            return nullptr;
         seg->add(body);
         auto end = keyword(TT::ENDWHILE);
+        if(!end) {
+            end = keywordSkip(TT::ENDWHILE);
+            if(!end)
+                return nullptr;
+        }
         seg->add(end);
     } else if ((seg= ifExpr())) {
         seg->type = NT::IF;
-        auto body = segment();
+        auto body = multipleSegments();
+        if(!body)
+            return nullptr;
         seg->add(body);
         auto middle = keyword(TT::ELSE);
-        if (!middle) {
-            middle = keywordSkip(TT::ENDIF);
-            seg->add(middle);
-            return seg;
+        if(!middle) {
+            middle = keywordSkip(TT::ELSE);
+            if(middle)
+                middle->type = NT::ELSE;
+            if (!middle) {
+                middle = keywordSkip(TT::ENDIF);
+                if (!middle)
+                    return nullptr;
+                seg->add(middle);
+                return seg;
+            }
         }
         seg->type = NT::IF_ELSE;
-        body = segment();
-        body->type = NT::ELSE;
+        body = multipleSegments();
+        if(!body)
+            return nullptr;
         auto end = keyword(TT::ENDELSE);
+        if(!end){
+            end = keywordSkip(TT::ENDELSE);
+            if(!end)
+                return nullptr;
+        }
         middle->add(body);
         middle->add(end);
         seg->add(middle);
@@ -94,7 +134,6 @@ NP Parser::segment() {
         seg->type = NT::STATEMENT;
         if(!endTemplate(seg))
             return nullptr;
-        seg->add(seg);
     } else if((seg= declaration())){
         return seg;
     }
@@ -124,65 +163,44 @@ NP Parser::keywordSkip(TT type){
 
 
 NP Parser::compoundExpr() {
+    //simple expression
     auto e = expr();
     if(e)
         return e;
-    if(auto tmp = accept(TT::OPBRACKET)){
-        auto lhs = compoundExpr();
-        if(!lhs)
-            return nullptr;
-        tmp = accept(TT::CLBRACKET);
-        if(!tmp)
-            return nullptr;
 
-        auto op = accept(TT::MATHOP);
-        if(!op){
-            op = accept(TT::LOGICOP);
-            if(!op)
-                return nullptr;
-        }
-        tmp = accept(TT::OPBRACKET);
-        if(!tmp)
-            return nullptr;
-        auto rhs = compoundExpr();
-        if(!rhs)
-            return nullptr;
-        tmp = accept(TT::CLBRACKET);
-        if(!tmp)
-            return nullptr;
-        op->add(lhs);
-        op->add(rhs);
-        op->type = NT::COMPOUND_EXPR;
-        return op;
-    }
-    return nullptr;
-
-}
-
-NP Parser::compoundLogicExpr() {
-    auto expr = compoundExpr();
-    if(expr)
-        return expr;
-
-    if(auto n = accept(TT::LOGICOP, "not")){
+    //not expression
+    if(auto not_expr = accept(TT::LOGICOP,"not")){
         auto child = compoundExpr();
-        n->add(child);
-        n->type = NT::LOGICOP;
-        return n;
+        if(!child)
+            return nullptr;
+        not_expr->add(child);
+        not_expr->type = NT::NOT_EXPR;
+        return not_expr;
     }
+    //compound expression
     if(auto tmp = accept(TT::OPBRACKET)){
         auto lhs = compoundExpr();
+        if(!lhs)
+            return nullptr;
         tmp = accept(TT::CLBRACKET);
         if(!tmp)
             return nullptr;
-        if(!lhs)
-            return nullptr;
+
         auto op = accept(TT::LOGICOP, "and");
-        if(!op){
-            op = accept(TT::LOGICOP, "or");
-            if(!op)
-                return nullptr;
+        if(op) {
+            op->type = NT::AND_EXPR;
         }
+        else if(op = accept(TT::LOGICOP, "or")) {
+            op->type = NT::OR_EXPR;
+        }
+        else if(op = accept(TT::MATHOP)) {
+            op->type = NT::MATH_EXPR;
+        }
+        else if(op = accept(TT::COMPOP)) {
+            op->type = NT::COMP_EXPR;
+
+        }
+
         tmp = accept(TT::OPBRACKET);
         if(!tmp)
             return nullptr;
@@ -194,11 +212,11 @@ NP Parser::compoundLogicExpr() {
             return nullptr;
         op->add(lhs);
         op->add(rhs);
-        op->type = NT::LOGICOP;
         return op;
     }
     return nullptr;
 }
+
 
 NP Parser::expr(){
     auto x = value();
@@ -212,6 +230,7 @@ NP Parser::expr(){
             return nullptr;
         mathop->add(x);
         mathop->add(y);
+        mathop->type = NT::MATH_EXPR;
         return mathop;
     }
     auto logicop = accept(TT::COMPOP);
@@ -221,6 +240,7 @@ NP Parser::expr(){
             return nullptr;
         logicop->add(x);
         logicop->add(y);
+        logicop->type = NT::COMP_EXPR;
         return logicop;
     }
 
@@ -271,6 +291,9 @@ NP Parser::forExpr() {
     if(!head) {
         return nullptr;
     }
+    auto type = accept(TT::TYPE);
+    if(!type)
+        return nullptr;
     auto x = accept(TT::ID);
     if(!x)
         return nullptr;
@@ -281,7 +304,7 @@ NP Parser::forExpr() {
     auto y = accept(TT::ID);
     if(!y)
         return nullptr;
-    y->type = NT::TOKEN;
+    head->add(type);
     head->add(x);
     head->add(y);
     if(!endTemplate(head))
@@ -293,10 +316,9 @@ NP Parser::whileExpr() {
     auto head = accept(TT::WHILE);
     if(!head)
         return nullptr;
-    auto cle = compoundLogicExpr();
+    auto cle = compoundExpr();
     if(!cle)
         return nullptr;
-    cle->type = NT::COMPOUND_LOGIC_EXPR;
     head->add(cle);
     if(!endTemplate(head))
         return nullptr;
@@ -309,10 +331,9 @@ NP Parser::ifExpr() {
     auto head = accept(TT::IF);
     if (!head)
         return nullptr;
-    auto cle = compoundLogicExpr();
+    auto cle = compoundExpr();
     if (!cle)
         return nullptr;
-    cle->type = NT::COMPOUND_LOGIC_EXPR;
     head->add(cle);
     if(!endTemplate(head))
         return nullptr;

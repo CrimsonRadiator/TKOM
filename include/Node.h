@@ -19,8 +19,12 @@ enum class NodeType{
     DECLARATION,
     STATEMENT,
     COMPOUND_LOGIC_EXPR,
-    COMPOUND_EXPR,
-    LOGICOP
+    MULTIPLE_SEGMENTS,
+    NOT_EXPR,
+    AND_EXPR,
+    OR_EXPR,
+    MATH_EXPR,
+    COMP_EXPR
 };
 
 

@@ -11,8 +11,7 @@ class Parser {
 public:
     explicit Parser(const Scanner& scanner_) :
                             scanner{scanner_},
-                            currentToken{TokenType::START, ""},
-                            previousToken{TokenType::START, ""}
+                            currentToken{TokenType::START, ""}
     {}
 
     void nextSymbol();
@@ -22,6 +21,7 @@ public:
     std::unique_ptr<Node> segment();
     std::unique_ptr<Node> root();
     std::unique_ptr<Node> statement();
+    std::unique_ptr<Node> multipleSegments();
     std::unique_ptr<Node> forExpr();
     std::unique_ptr<Node> whileExpr();
     std::unique_ptr<Node> ifExpr();
@@ -43,7 +43,6 @@ public:
 private:
     Scanner scanner;
     Token currentToken;
-    Token previousToken;
 };
 
 
