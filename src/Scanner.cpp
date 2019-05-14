@@ -2,6 +2,7 @@
 #include <cctype>
 #include <Scanner.h>
 #include <iostream>
+#include <Token.h>
 
 
 #include "Scanner.h"
@@ -159,6 +160,8 @@ Token Scanner::extractToken() {
             return Token(keywords[tmpString], tmpString);
         }
 
+
+        Logger::getInstance().logBadToken(source);
 
         //failure
         while(source.getNextChar()!= EOF)

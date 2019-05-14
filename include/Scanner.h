@@ -3,6 +3,8 @@
 
 #include "Source.h"
 #include "Token.h"
+#include "Logger.h"
+
 #include <sstream>
 #include <memory>
 #include <unordered_map>
@@ -15,6 +17,10 @@ public:
 
     Token getNextToken();
     std::string getTypeName(Token& t) const;
+
+    unsigned int getLine() const{
+        return source.getLineNumber();
+    }
 
 private:
     bool firstChar;

@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include "json.hpp"
+#include "json.h"
 #include "Source.h"
 #include "Scanner.h"
 

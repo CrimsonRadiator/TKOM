@@ -34,6 +34,8 @@ public:
     std::unique_ptr<Node> keywordSkip(TokenType t);
     std::unique_ptr<Node> value();
 
+    std::unique_ptr<Node> failure();
+
     Token getCurrentToken() const{
         return currentToken;
     }

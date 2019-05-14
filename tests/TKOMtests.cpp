@@ -394,6 +394,12 @@ BOOST_FIXTURE_TEST_SUITE(scanner_tests_suite, F)
         BOOST_TEST(resultTokens == testTokens, boost::test_tools::per_element());
     }
 
+    BOOST_AUTO_TEST_CASE(randomToken){
+        std::string str = "{#$%^&*(YUH{{]]}}GDUOIA intadd {}{}{}[][}{][]{()";
+        source.loadData(str);
+        read(true);
+    }
+
 BOOST_AUTO_TEST_SUITE_END()
 
 
@@ -413,19 +419,11 @@ BOOST_FIXTURE_TEST_SUITE(parse_tests_suite, P)
     }
 
     BOOST_AUTO_TEST_CASE(parseBadTemplate) {
-        std::string text = "{{ 1 == 1 }}";
+        std::string text = "{{ a == ) ) )  }}";
         source.loadData(text);
         auto result = parser.root();
 
-
-        auto test = make_node(TT::START, "", NT::START);
-        auto id = make_node(TT::COMPOP, "==", NT::STATEMENT);
-        auto a = make_node(TT::NUMBER, "1", NT::TOKEN);
-        auto b = make_node(TT::NUMBER, "1", NT::TOKEN);
-        id->add(a);
-        id->add(b);
-        test->add(id);
-        BOOST_CHECK(*test.get() == *result.get());
+        BOOST_CHECK(result == nullptr);
     }
 
 

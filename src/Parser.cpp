@@ -31,6 +31,8 @@ NP Parser::root(){
     while(auto seg = segment()){
         root->add(seg);
     }
+    if(root->children.empty())
+        return failure();
     return root;
 }
 
@@ -70,7 +72,7 @@ NP Parser::segment() {
         return seg;
     }
     if (!(seg = accept(TT::OPTEMPLATE)))
-        return seg;
+        return nullptr;
     else if (seg = forExpr()) {
         seg->type = NT::FOR_LOOP;
         auto body = multipleSegments();
@@ -84,6 +86,7 @@ NP Parser::segment() {
                 return nullptr;
         }
         seg->add(end);
+        return seg;
     } else if ((seg= whileExpr())) {
         seg->type = NT::WHILE_LOOP;
         auto body = multipleSegments();
@@ -97,6 +100,7 @@ NP Parser::segment() {
                 return nullptr;
         }
         seg->add(end);
+        return seg;
     } else if ((seg= ifExpr())) {
         seg->type = NT::IF;
         auto body = multipleSegments();
@@ -133,10 +137,14 @@ NP Parser::segment() {
     } else if((seg= expr())) {
         seg->type = NT::STATEMENT;
         if(!endTemplate(seg))
-            return nullptr;
+            return seg;
+        return seg;
     } else if((seg= declaration())){
         return seg;
     }
+
+
+
     return seg;
 }
 
@@ -340,5 +348,8 @@ NP Parser::ifExpr() {
     return head;
 }
 
-
+NP Parser::failure() {
+    Logger::getInstance().logParserFailure(scanner.getLine());
+    return nullptr;
+}
 

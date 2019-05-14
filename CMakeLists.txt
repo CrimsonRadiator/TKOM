@@ -6,4 +6,4 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -O2")
 
 include_directories(include)
 add_subdirectory(tests)
-add_executable(TKOM src/main.cpp include/json.hpp src/Scanner.cpp include/Scanner.h include/SymbolTable.h src/Source.cpp include/Source.h src/Token.cpp include/Token.h src/Parser.cpp include/Parser.h src/Node.cpp include/Node.h)
+add_executable(TKOM src/main.cpp include/json.h src/Scanner.cpp include/Scanner.h include/SymbolTable.h src/Source.cpp include/Source.h src/Token.cpp include/Token.h src/Parser.cpp include/Parser.h src/Node.cpp include/Node.h src/Logger.cpp include/Logger.h)
