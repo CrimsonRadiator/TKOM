@@ -10,24 +10,32 @@
 #include <unordered_map>
 
 
-class Scanner {
+class Scanner
+{
 public:
-    Scanner(Source& source);
+    Scanner(Source &source);
+
     ~Scanner();
 
     Token getNextToken();
-    std::string getTypeName(Token& t) const;
 
-    unsigned int getLine() const{
+    std::string getTypeName(Token &t) const;
+
+    unsigned int getLine() const
+    {
         return source.getLineNumber();
     }
 
 private:
     bool firstChar;
-    Source& source;
+    Source &source;
+
     char skipWhite();
-    std::string idRegex(std::string& text);
+
+    std::string idRegex(std::string &text);
+
     Token extractToken();
+
     bool outsideTemplate;
 
     std::unordered_map<std::string, TokenType> keywords;

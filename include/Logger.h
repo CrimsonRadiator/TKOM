@@ -6,24 +6,29 @@
 #include "Source.h"
 
 
-class Logger {
+class Logger
+{
 public:
-    static Logger& getInstance()
+    static Logger &getInstance()
     {
         static Logger instance;
         return instance;
     }
 
 private:
-    Logger() {}
+    Logger()
+    {}
 
 public:
-    Logger(Logger const& ) = delete;
-    void operator=(Logger const& ) = delete;
+    Logger(Logger const &) = delete;
 
-    void logBadToken(Source& source) const;
+    void operator=(Logger const &) = delete;
+
+    void logBadToken(Source &source) const;
+
     void logParserFailure(unsigned int) const;
-    void logUndefinedSymbol(const Token& t) const;
+
+    void logUndefinedSymbol(const Token &t) const;
 };
 
 

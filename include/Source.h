@@ -5,22 +5,23 @@
 #include <sstream>
 #include <string>
 
-class Source{
+class Source
+{
 public:
-    explicit Source(const std::string& filename) :
-                            sourceStream(filename),
-                            currentChar{0},
-                            lineNumber{0},
-                            charNumber{0},
-                            position{0}
-
+    explicit Source(const std::string &filename) :
+            sourceStream(filename),
+            currentChar{0},
+            lineNumber{0},
+            charNumber{0},
+            position{0}
     {}
 
 
     explicit Source() : currentChar{0},
                         lineNumber{0},
                         charNumber{0},
-                        position{0} {}
+                        position{0}
+    {}
 
     /*! \brief extracts new char
      *
@@ -36,19 +37,23 @@ public:
      *
      * @return next char from input file
      */
-    virtual char peekNextChar(){
+    virtual char peekNextChar()
+    {
         return sourceStream.peek();
     }
 
-    virtual char getCurr(){
+    virtual char getCurr()
+    {
         return currentChar;
     }
 
-    unsigned getLineNumber() const{
+    unsigned getLineNumber() const
+    {
         return lineNumber;
     }
 
-    unsigned getCharNumber() const{
+    unsigned getCharNumber() const
+    {
         return charNumber;
     }
 

@@ -7,7 +7,8 @@
 
 #include "Token.h"
 
-enum class NodeType{
+enum class NodeType
+{
     START,
     WHILE_LOOP,
     FOR_LOOP,
@@ -26,10 +27,11 @@ enum class NodeType{
 };
 
 
-class Node {
+class Node
+{
 public:
 
-    Node(const Token& token_) : type{NodeType::TOKEN}, newline{false}, token{token_}
+    Node(const Token &token_) : type{NodeType::TOKEN}, newline{false}, token{token_}
     {
     }
 
@@ -39,7 +41,8 @@ public:
     Token token;
     std::vector<std::unique_ptr<Node>> children;
 
-    void add(std::unique_ptr<Node>& node) {
+    void add(std::unique_ptr<Node> &node)
+    {
         children.emplace_back(std::move(node));
     }
 

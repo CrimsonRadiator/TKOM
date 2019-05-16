@@ -4,10 +4,11 @@
 #include <string>
 #include <fstream>
 
-class TemplateGenerator {
+class TemplateGenerator
+{
 public:
-    TemplateGenerator(const std::string& filename) :
-        outStream(filename)
+    TemplateGenerator(const std::string &filename) :
+            outStream(filename)
     {};
 
 private:

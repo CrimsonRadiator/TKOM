@@ -9,22 +9,24 @@
 #include "SymbolTable.h"
 
 
-
-
-Token Scanner::getNextToken() {
+Token Scanner::getNextToken()
+{
     return extractToken();
 }
 
 
-char Scanner::skipWhite(){
+char Scanner::skipWhite()
+{
     while (!(isblank(source.getCurr()) && !isblank(source.peekNextChar())))
         source.getNextChar();
 
     return source.getNextChar();
 }
 
-Token Scanner::extractToken() {
-    if(firstChar){
+Token Scanner::extractToken()
+{
+    if (firstChar)
+    {
         source.getNextChar();
         firstChar = false;
     }
@@ -35,10 +37,12 @@ Token Scanner::extractToken() {
     if (source.getCurr() == EOF)
         return Token(TokenType::EOFT, "");
 
-    else if (outsideTemplate) {
+    else if (outsideTemplate)
+    {
 
         //open template
-        if(source.getCurr() == '{' && source.peekNextChar() == '{') {
+        if (source.getCurr() == '{' && source.peekNextChar() == '{')
+        {
             source.getNextChar();
             source.getNextChar();
             outsideTemplate = false;
@@ -46,13 +50,14 @@ Token Scanner::extractToken() {
         }
 
 
-
         std::string text(1, source.getCurr());
 
         //get all text
-        while (source.peekNextChar() != EOF && !(source.getCurr() =='{' && source.peekNextChar()=='{')) {
+        while (source.peekNextChar() != EOF && !(source.getCurr() == '{' && source.peekNextChar() == '{'))
+        {
             //escape char
-            if(source.peekNextChar() == '\\') {
+            if (source.peekNextChar() == '\\')
+            {
                 source.getNextChar();
                 if (source.peekNextChar() == EOF)
                     break;
@@ -61,41 +66,49 @@ Token Scanner::extractToken() {
                 text += source.getNextChar();
         }
 
-        if (source.getCurr() == EOF){
+        if (source.getCurr() == EOF)
+        {
             return Token(TokenType::EOFT, "");
         }
-        else if (source.peekNextChar() == EOF) {
+        else if (source.peekNextChar() == EOF)
+        {
             source.getNextChar();
             return Token(TokenType::TEXT, text);
         }
-        else {
-            text = text.substr(0, text.size()-1); //TODO: no-copy way
+        else
+        {
+            text = text.substr(0, text.size() - 1); //TODO: no-copy way
             return Token(TokenType::TEXT, text);
         }
     }
-    else{
+    else
+    {
 
         //skip whitespaces
-        if(isblank(source.getCurr()))
+        if (isblank(source.getCurr()))
             skipWhite();
 
         //brace
-        if(source.getCurr() == '('){
+        if (source.getCurr() == '(')
+        {
             source.getNextChar();
             return Token(TokenType::OPBRACKET, "(");
         }
 
         //brace
-        if(source.getCurr() == ')') {
+        if (source.getCurr() == ')')
+        {
             source.getNextChar();
             return Token(TokenType::CLBRACKET, ")");
         }
 
         //end template
-        if (source.getCurr() == '}' && source.peekNextChar() =='}'){
+        if (source.getCurr() == '}' && source.peekNextChar() == '}')
+        {
             outsideTemplate = true;
             source.getNextChar();
-            if(source.getNextChar() == '\n') {
+            if (source.getNextChar() == '\n')
+            {
                 source.getNextChar();
                 return Token(TokenType::CLTEMPLATENEW, "}}");
             }
@@ -103,27 +116,31 @@ Token Scanner::extractToken() {
         }
 
         //id or keyword
-        if(isalpha(source.getCurr())){
-            std::string text(1,source.getCurr());
-            while(source.getCurr()!= EOF && isalnum(source.getCurr())) {
+        if (isalpha(source.getCurr()))
+        {
+            std::string text(1, source.getCurr());
+            while (source.getCurr() != EOF && isalnum(source.getCurr()))
+            {
                 text += source.getNextChar();
             }
 
             //skip last char
-            text = text.substr(0, text.size()-1); //TODO: no-copy way
+            text = text.substr(0, text.size() - 1); //TODO: no-copy way
 
 
             //check if keyword
-            if(keywords.find(text)!=keywords.end())
+            if (keywords.find(text) != keywords.end())
                 return Token(keywords[text], text);
 
             //check if EOF
-            if(source.getCurr() == EOF){
+            if (source.getCurr() == EOF)
+            {
                 return Token(TokenType::EOFT, "");
             }
 
-            if (source.getCurr() =='.' || source.getCurr() == '['){
-                text+=source.getCurr();
+            if (source.getCurr() == '.' || source.getCurr() == '[')
+            {
+                text += source.getCurr();
                 return Token(TokenType::ID, idRegex(text));
             }
 
@@ -131,31 +148,35 @@ Token Scanner::extractToken() {
         }
 
         //check if digit
-        if(isdigit(source.getCurr())){
+        if (isdigit(source.getCurr()))
+        {
             std::string text(1, source.getCurr());
-            while(source.getCurr()!= EOF && isdigit(source.getCurr())){
-                text+=source.getNextChar();
+            while (source.getCurr() != EOF && isdigit(source.getCurr()))
+            {
+                text += source.getNextChar();
             }
-            if(source.getCurr()==EOF)
+            if (source.getCurr() == EOF)
                 return Token(TokenType::EOFT, "");
 
-            text = text.substr(0, text.size()-1); //TODO: no-copy way
+            text = text.substr(0, text.size() - 1); //TODO: no-copy way
             return Token(TokenType::NUMBER, text);
         }
 
         std::string tmpString = {source.getCurr(), source.peekNextChar()};
 
         //get two letter operators
-        if(keywords.find(tmpString)!=keywords.end()) {
+        if (keywords.find(tmpString) != keywords.end())
+        {
             source.getNextChar();
             source.getNextChar();
             return Token(keywords[tmpString], tmpString);
         }
 
-        tmpString= tmpString.substr(0, tmpString.size()-1);
+        tmpString = tmpString.substr(0, tmpString.size() - 1);
 
         //get one letter operators
-        if(keywords.find(tmpString)!=keywords.end()) {
+        if (keywords.find(tmpString) != keywords.end())
+        {
             source.getNextChar();
             return Token(keywords[tmpString], tmpString);
         }
@@ -164,7 +185,7 @@ Token Scanner::extractToken() {
         Logger::getInstance().logBadToken(source);
 
         //failure
-        while(source.getNextChar()!= EOF)
+        while (source.getNextChar() != EOF)
         {}
 
         return Token(TokenType::EOFT, "");
@@ -172,43 +193,53 @@ Token Scanner::extractToken() {
 
 }
 
-std::string Scanner::idRegex(std::string& text){
-    if(isalpha(source.getCurr())) {
-        text+=source.getCurr();
-        while (isalnum(source.getCurr())) {
+std::string Scanner::idRegex(std::string &text)
+{
+    if (isalpha(source.getCurr()))
+    {
+        text += source.getCurr();
+        while (isalnum(source.getCurr()))
+        {
             text += source.getNextChar();
         }
     }
 
-    if(source.getCurr() == '.'){
+    if (source.getCurr() == '.')
+    {
         source.getNextChar();
         return idRegex(text);
     }
-    else if(source.getCurr() == '['){
-        do{
-            text+=source.getNextChar();
-        }while(isdigit(source.getCurr()));
+    else if (source.getCurr() == '[')
+    {
+        do
+        {
+            text += source.getNextChar();
+        } while (isdigit(source.getCurr()));
 
-        if(source.getCurr()=='.' || source.getCurr()==']'){
+        if (source.getCurr() == '.' || source.getCurr() == ']')
+        {
             source.getNextChar();
-            text+=source.getCurr();
+            text += source.getCurr();
             return idRegex(text);
         }
         else return idRegex(text);
     }
-    else{
-        text = text.substr(0, text.length()-1);
+    else
+    {
+        text = text.substr(0, text.length() - 1);
         return text;
     }
 }
 
-std::string Scanner::getTypeName(Token& t) const{
+std::string Scanner::getTypeName(Token &t) const
+{
     return typeNames.at(t.getType());
 }
 
-Scanner::Scanner(Source& source_) : firstChar{true},
+Scanner::Scanner(Source &source_) : firstChar{true},
                                     source{source_},
-                                    outsideTemplate{true} {
+                                    outsideTemplate{true}
+{
 
     keywords.emplace(std::make_pair("=", TokenType::ASSIGNOP));
     keywords.emplace(std::make_pair("not", TokenType::LOGICOP));
@@ -265,5 +296,5 @@ Scanner::Scanner(Source& source_) : firstChar{true},
     typeNames.emplace(std::make_pair(TokenType::TYPE, "TYPE"));
 }
 
-Scanner::~Scanner()  = default;
+Scanner::~Scanner() = default;
 

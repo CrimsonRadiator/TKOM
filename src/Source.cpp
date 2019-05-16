@@ -4,15 +4,19 @@
 
 #include "Source.h"
 
-char Source::getNextChar() {
+char Source::getNextChar()
+{
 
-    if(!sourceStream.get(currentChar))
-        currentChar=EOF;
+    if (!sourceStream.get(currentChar))
+        currentChar = EOF;
 
-    if (currentChar == '\n') {
+    if (currentChar == '\n')
+    {
         ++lineNumber;
         charNumber = 0;
-    } else {
+    }
+    else
+    {
         ++charNumber;
     }
     return currentChar;

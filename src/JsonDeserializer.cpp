@@ -41,7 +41,7 @@ std::string JsonDeserializer::getValueFromString(const std::string &str) const
                 return j[index_number].dump();
             }
 
-                //TODO: out of range check
+            //TODO: out of range check
             j = j[index_number];
 
         }
@@ -49,7 +49,7 @@ std::string JsonDeserializer::getValueFromString(const std::string &str) const
         {
             if (it + 1 == str.end())
             {
-                if(!j.contains(object_string))
+                if (!j.contains(object_string))
                 {
                     //TODO: Logger
                     return "";
@@ -57,7 +57,7 @@ std::string JsonDeserializer::getValueFromString(const std::string &str) const
                 return j[object_string].dump();
             }
 
-            if(!j.contains(object_string))
+            if (!j.contains(object_string))
             {
                 //TODO: Logger
                 return "";
@@ -71,7 +71,7 @@ std::string JsonDeserializer::getValueFromString(const std::string &str) const
         }
 
     }
-    if(!j.contains(object_string))
+    if (!j.contains(object_string))
     {
         //TODO: Logger
         return "";

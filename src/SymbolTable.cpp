@@ -67,12 +67,13 @@ int SymbolTable::evaluateExpression(const Node &expr)
         auto it = symbols.find(t.getText());
         if (it == symbols.end())
         {
-            if (!jd.getValueFromString(t.getText()).empty()){
+            if (!jd.getValueFromString(t.getText()).empty())
+            {
                 //TODO: Return value;
             }
-                //ERROR
-                //TODO: Add logger info about error.
-                return 0;
+            //ERROR
+            //TODO: Add logger info about error.
+            return 0;
         }
 
         std::string value = it->second.first;

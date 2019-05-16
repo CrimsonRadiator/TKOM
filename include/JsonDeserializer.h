@@ -5,12 +5,15 @@
 
 using json = nlohmann::json;
 
-class JsonDeserializer {
+class JsonDeserializer
+{
 
 public:
-    explicit JsonDeserializer(const json& json_data_) : json_data{json_data_} {};
+    explicit JsonDeserializer(const json &json_data_) : json_data{json_data_}
+    {};
 
-    std::string getValueFromString(const std::string& str) const;
+    std::string getValueFromString(const std::string &str) const;
+
 private:
     json json_data;
 };

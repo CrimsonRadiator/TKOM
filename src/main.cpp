@@ -9,7 +9,8 @@
 
 using json = nlohmann::json;
 
-int main() {
+int main()
+{
     Source src("a.txt");
     std::ifstream fs("../data.json");
     json j_data;
@@ -17,9 +18,9 @@ int main() {
 
     //std::cout<<j_data["pi"];
     JsonDeserializer deserializer(j_data);
-    std::cout <<deserializer.getValueFromString("pi");
-    std::cout <<deserializer.getValueFromString("answer.everything");
-    std::cout <<deserializer.getValueFromString("list[2]");
+    std::cout << deserializer.getValueFromString("pi");
+    std::cout << deserializer.getValueFromString("answer.everything");
+    std::cout << deserializer.getValueFromString("list[2]");
 
     Scanner scanner(src);
     Parser parser(scanner);
