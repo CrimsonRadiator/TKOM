@@ -9,6 +9,7 @@
 #include "Source.h"
 #include "Scanner.h"
 #include "Parser.h"
+#include "JsonDeserializer.h"
 
 
 typedef std::pair<std::string, std::string> PSS;
@@ -144,14 +145,14 @@ BOOST_FIXTURE_TEST_SUITE(scanner_tests_suite, F)
     BOOST_AUTO_TEST_CASE(emptyString) {
         std::string str = "";
         source.loadData(str);
-        BOOST_CHECK_EQUAL( read(true), 0);
+        BOOST_CHECK_EQUAL( read(false), 0);
     }
 
     BOOST_AUTO_TEST_CASE(oneLetter) {
         std::string str = "a";
         testTokens.emplace_back(std::make_pair("TEXT", "a"));
         source.loadData(str);
-        BOOST_CHECK_EQUAL( read(true), 1);
+        BOOST_CHECK_EQUAL( read(false), 1);
         BOOST_TEST( resultTokens == testTokens, boost::test_tools::per_element() );
 
     }
@@ -160,7 +161,7 @@ BOOST_FIXTURE_TEST_SUITE(scanner_tests_suite, F)
         std::string str = "this is random text\neven more @#$%^&\n*#$)(&^%$#$%^&*";
         testTokens.emplace_back(std::make_pair("TEXT", str));
         source.loadData(str);
-        BOOST_CHECK_EQUAL( read(true), 1);
+        BOOST_CHECK_EQUAL( read(false), 1);
         BOOST_TEST( resultTokens == testTokens, boost::test_tools::per_element() );
 
     }
@@ -170,7 +171,7 @@ BOOST_FIXTURE_TEST_SUITE(scanner_tests_suite, F)
         str+="for i in a.code = % != >= <= < > ! not and or ";
         testTokens.emplace_back(std::make_pair("TEXT", str));
         source.loadData(str);
-        BOOST_CHECK_EQUAL( read(true), 1);
+        BOOST_CHECK_EQUAL( read(false), 1);
         BOOST_TEST( resultTokens == testTokens, boost::test_tools::per_element() );
 
     }
@@ -188,7 +189,7 @@ BOOST_FIXTURE_TEST_SUITE(scanner_tests_suite, F)
         testTokens.emplace_back(std::make_pair("TEXT", " outsideagain"));
 
         source.loadData(str);
-        read(true);
+        read(false);
         BOOST_TEST( resultTokens == testTokens, boost::test_tools::per_element() );
 
     }
@@ -204,7 +205,7 @@ BOOST_FIXTURE_TEST_SUITE(scanner_tests_suite, F)
         testTokens.emplace_back(std::make_pair("TEXT", " asdf"));
 
         source.loadData(str);
-        read(true);
+        read(false);
         BOOST_TEST( resultTokens == testTokens, boost::test_tools::per_element() );
     }
 
@@ -234,7 +235,7 @@ BOOST_FIXTURE_TEST_SUITE(scanner_tests_suite, F)
 
 
         source.loadData(str);
-        read(true);
+        read(false);
         BOOST_TEST( resultTokens == testTokens, boost::test_tools::per_element() );
     }
 
@@ -247,7 +248,7 @@ BOOST_FIXTURE_TEST_SUITE(scanner_tests_suite, F)
         testTokens.emplace_back(std::make_pair("NUMBER", "0"));
         testTokens.emplace_back(std::make_pair("CLTEMPLATENONEW", "}}"));
         source.loadData(str);
-        read(true);
+        read(false);
         BOOST_TEST(resultTokens == testTokens, boost::test_tools::per_element());
     }
 
@@ -260,7 +261,7 @@ BOOST_FIXTURE_TEST_SUITE(scanner_tests_suite, F)
         testTokens.emplace_back(std::make_pair("ID", "y"));
         testTokens.emplace_back(std::make_pair("CLTEMPLATENONEW", "}}"));
         source.loadData(str);
-        read(true);
+        read(false);
         BOOST_TEST(resultTokens == testTokens, boost::test_tools::per_element());
     }
 
@@ -277,7 +278,7 @@ BOOST_FIXTURE_TEST_SUITE(scanner_tests_suite, F)
         testTokens.emplace_back(std::make_pair("ELSE", "else"));
         testTokens.emplace_back(std::make_pair("CLTEMPLATENONEW", "}}"));
         source.loadData(str);
-        read(true);
+        read(false);
         BOOST_TEST(resultTokens == testTokens, boost::test_tools::per_element());
     }
 
@@ -300,7 +301,7 @@ BOOST_FIXTURE_TEST_SUITE(scanner_tests_suite, F)
         testTokens.emplace_back(std::make_pair("ENDELSE", "endelse"));
         testTokens.emplace_back(std::make_pair("CLTEMPLATENONEW", "}}"));
         source.loadData(str);
-        read(true);
+        read(false);
         BOOST_TEST(resultTokens == testTokens, boost::test_tools::per_element());
     }
 
@@ -323,7 +324,7 @@ BOOST_FIXTURE_TEST_SUITE(scanner_tests_suite, F)
         testTokens.emplace_back(std::make_pair("MATHOP", "/"));
         testTokens.emplace_back(std::make_pair("CLTEMPLATENONEW", "}}"));
         source.loadData(str);
-        read(true);
+        read(false);
         BOOST_TEST(resultTokens == testTokens, boost::test_tools::per_element());
     }
 
@@ -345,7 +346,7 @@ BOOST_FIXTURE_TEST_SUITE(scanner_tests_suite, F)
         testTokens.emplace_back(std::make_pair("CLBRACKET", ")"));
         testTokens.emplace_back(std::make_pair("CLTEMPLATENONEW", "}}"));
         source.loadData(str);
-        read(true);
+        read(false);
         BOOST_TEST(resultTokens == testTokens, boost::test_tools::per_element());
     }
 
@@ -368,7 +369,7 @@ BOOST_FIXTURE_TEST_SUITE(scanner_tests_suite, F)
 
         testTokens.emplace_back(std::make_pair("CLTEMPLATENONEW", "}}"));
         source.loadData(str);
-        read(true);
+        read(false);
         BOOST_TEST(resultTokens == testTokens, boost::test_tools::per_element());
     }
 
@@ -376,7 +377,7 @@ BOOST_FIXTURE_TEST_SUITE(scanner_tests_suite, F)
         std::string str = "alamakota \\{\\{ for x in y\\}\\}";
         testTokens.emplace_back(std::make_pair("TEXT", "alamakota {{ for x in y}}"));
         source.loadData(str);
-        read(true);
+        read(false);
         BOOST_TEST(resultTokens == testTokens, boost::test_tools::per_element());
     }
 
@@ -390,14 +391,14 @@ BOOST_FIXTURE_TEST_SUITE(scanner_tests_suite, F)
         testTokens.emplace_back(std::make_pair("CLTEMPLATENONEW", "}}"));
 
         source.loadData(str);
-        read(true);
+        read(false);
         BOOST_TEST(resultTokens == testTokens, boost::test_tools::per_element());
     }
 
     BOOST_AUTO_TEST_CASE(randomToken){
         std::string str = "{#$%^&*(YUH{{]]}}GDUOIA intadd {}{}{}[][}{][]{()";
         source.loadData(str);
-        read(true);
+        read(false);
     }
 
 BOOST_AUTO_TEST_SUITE_END()

@@ -23,6 +23,7 @@ public:
 
     void logBadToken(Source& source) const;
     void logParserFailure(unsigned int) const;
+    void logUndefinedSymbol(const Token& t) const;
 };
 
 

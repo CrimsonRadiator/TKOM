@@ -11,7 +11,7 @@ file(GLOB TKOMsrc ${CMAKE_SOURCE_DIR}/include/*.h ${CMAKE_SOURCE_DIR}/src/*.cpp)
 list(REMOVE_ITEM TKOMsrc "${CMAKE_SOURCE_DIR}/src/main.cpp")
 
 # creates the executable
-add_executable(tkom_tests TKOMtests.cpp ${TKOMsrc})
+add_executable(tkom_tests TKOMtests.cpp ${TKOMsrc} )
 
 # for code coverage
 SET(GCC_COVERAGE_COMPILE_FLAGS "-fprofile-arcs -ftest-coverage")
