@@ -14,7 +14,6 @@
 
 typedef std::pair<std::string, std::string> PSS;
 typedef TokenType TT;
-typedef NodeType NT;
 typedef std::unique_ptr<Node> NP;
 
 
@@ -111,9 +110,8 @@ public:
 
 };
 
-NP make_node(TT ttype, const std::string& str, NT ntype){
+NP make_node(TT ttype, const std::string& str){
     NP result = std::make_unique<Node>(Token(ttype, str));
-    result->type = ntype;
     return result;
 }
 
@@ -128,9 +126,10 @@ bool operator == (const Node &L, const Node &R)
         if (*L.children[i].get() != *R.children[i].get())
             return false;
     }
-    return(L.type == R.type &&
+    return(
            L.token.getType() == R.token.getType() &&
-           L.token.getText() == R.token.getText());
+           L.token.getText() == R.token.getText()
+           );
 }
 
 bool operator != (const Node &L, const Node &R){
@@ -413,8 +412,8 @@ BOOST_FIXTURE_TEST_SUITE(parse_tests_suite, P)
         source.loadData(text);
         auto result = parser.root();
 
-        auto test = make_node(TT::START, "", NT::START);
-        auto id = make_node(TT::ID, "token", NT::STATEMENT);
+        auto test = make_node(TT::START, "");
+        auto id = make_node(TT::ID, "token");
         test->add(id);
         BOOST_CHECK(*test.get() == *result.get());
     }
@@ -433,11 +432,11 @@ BOOST_FIXTURE_TEST_SUITE(parse_tests_suite, P)
         source.loadData(text);
         auto result = parser.root();
 
-        auto test = make_node(TT::START, "", NT::START);
-        auto type = make_node(TT::TYPE, "int", NT::DECLARATION);
-        auto eq = make_node(TT::ASSIGNOP, "=", NT::TOKEN);
-        auto x = make_node(TT::ID, "x", NT::TOKEN);
-        auto b = make_node(TT::NUMBER, "1", NT::TOKEN);
+        auto test = make_node(TT::START, "");
+        auto type = make_node(TT::TYPE, "int");
+        auto eq = make_node(TT::ASSIGNOP, "=");
+        auto x = make_node(TT::ID, "x");
+        auto b = make_node(TT::NUMBER, "1");
         eq->add(x);
         eq->add(b);
         type->add(eq);
@@ -450,11 +449,11 @@ BOOST_FIXTURE_TEST_SUITE(parse_tests_suite, P)
         source.loadData(text);
         auto result = parser.root();
 
-        auto test = make_node(TT::START, "", NT::START);
-        auto type = make_node(TT::TYPE, "bool", NT::DECLARATION);
-        auto eq = make_node(TT::ASSIGNOP, "=", NT::TOKEN);
-        auto x = make_node(TT::ID, "x", NT::TOKEN);
-        auto y = make_node(TT::ID, "y", NT::TOKEN);
+        auto test = make_node(TT::START, "");
+        auto type = make_node(TT::TYPE, "bool");
+        auto eq = make_node(TT::ASSIGNOP, "=");
+        auto x = make_node(TT::ID, "x");
+        auto y = make_node(TT::ID, "y");
         eq->add(x);
         eq->add(y);
         type->add(eq);
@@ -467,20 +466,20 @@ BOOST_FIXTURE_TEST_SUITE(parse_tests_suite, P)
         source.loadData(text);
         auto result = parser.root();
 
-        auto test = make_node(TT::START, "", NT::START);
-        auto for_expr= make_node(TT::FOR, "for", NT::FOR_LOOP);
-        auto type = make_node(TT::TYPE, "int", NT::TOKEN);
-        auto x = make_node(TT::ID, "x", NT::TOKEN);
-        auto range = make_node(TT::ID, "range", NT::TOKEN);
+        auto test = make_node(TT::START, "");
+        auto for_expr= make_node(TT::FOR, "for");
+        auto type = make_node(TT::TYPE, "int");
+        auto x = make_node(TT::ID, "x");
+        auto range = make_node(TT::ID, "range");
         for_expr->add(type);
         for_expr->add(x);
         for_expr->add(range);
 
-        auto body = make_node(TT::START, "", NT::MULTIPLE_SEGMENTS);
-        auto t = make_node(TT::TEXT, " TTTEEXXTT ", NT::TOKEN);
+        auto body = make_node(TT::MULTIPLE_SEGMENTS, "");
+        auto t = make_node(TT::TEXT, " TTTEEXXTT ");
         body->add(t);
 
-        auto endfor = make_node(TT::ENDFOR, "endfor", NT::TOKEN);
+        auto endfor = make_node(TT::ENDFOR, "endfor");
 
         for_expr->add(body);
         for_expr->add(endfor);
@@ -495,21 +494,21 @@ BOOST_FIXTURE_TEST_SUITE(parse_tests_suite, P)
         source.loadData(text);
         auto result = parser.root();
 
-        auto test = make_node(TT::START, "", NT::START);
-        auto while_expr= make_node(TT::WHILE, "while", NT::WHILE_LOOP);
-        auto gt = make_node(TT::COMPOP, ">", NT::COMP_EXPR);
-        auto x = make_node(TT::ID, "x", NT::TOKEN);
-        auto zero = make_node(TT::NUMBER, "0", NT::TOKEN);
+        auto test = make_node(TT::START, "");
+        auto while_expr= make_node(TT::WHILE, "while");
+        auto gt = make_node(TT::COMPOP, ">");
+        auto x = make_node(TT::ID, "x");
+        auto zero = make_node(TT::NUMBER, "0");
 
         gt->add(x);
         gt->add(zero);
         while_expr->add(gt);
 
-        auto body = make_node(TT::START, "", NT::MULTIPLE_SEGMENTS);
-        auto t = make_node(TT::TEXT, " TTTEEXXTT ", NT::TOKEN);
+        auto body = make_node(TT::MULTIPLE_SEGMENTS, "");
+        auto t = make_node(TT::TEXT, " TTTEEXXTT ");
         body->add(t);
 
-        auto endwhile = make_node(TT::ENDWHILE, "endwhile", NT::TOKEN);
+        auto endwhile = make_node(TT::ENDWHILE, "endwhile");
 
         while_expr->add(body);
         while_expr->add(endwhile);
@@ -525,18 +524,18 @@ BOOST_FIXTURE_TEST_SUITE(parse_tests_suite, P)
         auto result = parser.root();
 
 
-        auto test = make_node(TT::START, "", NT::START);
-        auto if_expr= make_node(TT::IF, "if", NT::IF);
-        auto cond = make_node(TT::COMPOP, "==", NT::COMP_EXPR);
-        auto x = make_node(TT::ID, "x", NT::TOKEN);
-        auto tr= make_node(TT::BOOLVAL, "true", NT::TOKEN);
+        auto test = make_node(TT::START, "");
+        auto if_expr= make_node(TT::IF, "if");
+        auto cond = make_node(TT::COMPOP, "==");
+        auto x = make_node(TT::ID, "x");
+        auto tr= make_node(TT::BOOLVAL, "true");
         cond->add(x);
         cond->add(tr);
         if_expr->add(cond);
-        auto body = make_node(TT::START, "", NT::MULTIPLE_SEGMENTS);
-        auto t = make_node(TT::TEXT, " TTTEEXXTT ", NT::TOKEN);
+        auto body = make_node(TT::MULTIPLE_SEGMENTS, "");
+        auto t = make_node(TT::TEXT, " TTTEEXXTT ");
         body->add(t);
-        auto endif = make_node(TT::ENDIF, "endif", NT::TOKEN);
+        auto endif = make_node(TT::ENDIF, "endif");
         if_expr->add(body);
         if_expr->add(endif);
 
@@ -551,22 +550,22 @@ BOOST_FIXTURE_TEST_SUITE(parse_tests_suite, P)
         source.loadData(text);
         auto result = parser.root();
 
-        auto test = make_node(TT::START, "", NT::START);
-        auto if_expr= make_node(TT::IF, "if", NT::IF_ELSE);
-        auto cond = make_node(TT::COMPOP, "==", NT::COMP_EXPR);
-        auto x = make_node(TT::ID, "x", NT::TOKEN);
-        auto tr= make_node(TT::BOOLVAL, "true", NT::TOKEN);
+        auto test = make_node(TT::START, "");
+        auto if_expr= make_node(TT::IF, "if");
+        auto cond = make_node(TT::COMPOP, "==");
+        auto x = make_node(TT::ID, "x");
+        auto tr= make_node(TT::BOOLVAL, "true");
         cond->add(x);
         cond->add(tr);
         if_expr->add(cond);
-        auto body = make_node(TT::START, "", NT::MULTIPLE_SEGMENTS);
-        auto t = make_node(TT::TEXT, " TTTEEXXTT ", NT::TOKEN);
+        auto body = make_node(TT::MULTIPLE_SEGMENTS, "");
+        auto t = make_node(TT::TEXT, " TTTEEXXTT ");
         body->add(t);
-        auto el = make_node(TT::ELSE, "else", NT::ELSE);
-        auto body2 = make_node(TT::START, "", NT::MULTIPLE_SEGMENTS);
-        auto t2 = make_node(TT::TEXT, " 222222 ", NT::TOKEN);
+        auto el = make_node(TT::ELSE, "else");
+        auto body2 = make_node(TT::MULTIPLE_SEGMENTS, "");
+        auto t2 = make_node(TT::TEXT, " 222222 ");
         body2->add(t2);
-        auto endif = make_node(TT::ENDELSE, "endelse", NT::TOKEN);
+        auto endif = make_node(TT::ENDELSE, "endelse");
         if_expr->add(body);
         el->add(body2);
         el->add(endif);
@@ -583,37 +582,37 @@ BOOST_FIXTURE_TEST_SUITE(parse_tests_suite, P)
         source.loadData(text);
         auto result = parser.root();
 
-        auto test = make_node(TT::START, "", NT::START);
-        auto if_expr= make_node(TT::IF, "if", NT::IF_ELSE);
-        auto cond = make_node(TT::COMPOP, "==", NT::COMP_EXPR);
-        auto x = make_node(TT::ID, "x", NT::TOKEN);
-        auto tr= make_node(TT::BOOLVAL, "true", NT::TOKEN);
+        auto test = make_node(TT::START, "");
+        auto if_expr= make_node(TT::IF, "if");
+        auto cond = make_node(TT::COMPOP, "==");
+        auto x = make_node(TT::ID, "x");
+        auto tr= make_node(TT::BOOLVAL, "true");
         cond->add(x);
         cond->add(tr);
         if_expr->add(cond);
-        auto body = make_node(TT::START, "", NT::MULTIPLE_SEGMENTS);
+        auto body = make_node(TT::MULTIPLE_SEGMENTS, "");
 
-        auto Wif_expr= make_node(TT::IF, "if", NT::IF);
-        auto Wcond = make_node(TT::COMPOP, ">", NT::COMP_EXPR);
-        auto Wx = make_node(TT::ID, "y", NT::TOKEN);
-        auto Wtr= make_node(TT::NUMBER, "0", NT::TOKEN);
+        auto Wif_expr= make_node(TT::IF, "if");
+        auto Wcond = make_node(TT::COMPOP, ">");
+        auto Wx = make_node(TT::ID, "y");
+        auto Wtr= make_node(TT::NUMBER, "0");
         Wcond->add(Wx);
         Wcond->add(Wtr);
         Wif_expr->add(Wcond);
-        auto Wbody = make_node(TT::START, "", NT::MULTIPLE_SEGMENTS);
-        auto Wt = make_node(TT::TEXT, " 1111 ", NT::TOKEN);
+        auto Wbody = make_node(TT::MULTIPLE_SEGMENTS, "");
+        auto Wt = make_node(TT::TEXT, " 1111 ");
         Wbody->add(Wt);
-        auto Wendif = make_node(TT::ENDIF, "endif", NT::TOKEN);
+        auto Wendif = make_node(TT::ENDIF, "endif");
         Wif_expr->add(Wbody);
         Wif_expr->add(Wendif);
 
         body->add(Wif_expr);
 
-        auto el = make_node(TT::ELSE, "else", NT::ELSE);
-        auto body2 = make_node(TT::START, "", NT::MULTIPLE_SEGMENTS);
-        auto t2 = make_node(TT::TEXT, " 222222 ", NT::TOKEN);
+        auto el = make_node(TT::ELSE, "else");
+        auto body2 = make_node(TT::MULTIPLE_SEGMENTS, "");
+        auto t2 = make_node(TT::TEXT, " 222222 ");
         body2->add(t2);
-        auto endif = make_node(TT::ENDELSE, "endelse", NT::TOKEN);
+        auto endif = make_node(TT::ENDELSE, "endelse");
         if_expr->add(body);
         el->add(body2);
         el->add(endif);
@@ -630,42 +629,42 @@ BOOST_FIXTURE_TEST_SUITE(parse_tests_suite, P)
         source.loadData(text);
         auto result = parser.root();
 
-        auto test = make_node(TT::START, "", NT::START);
-        auto if_expr= make_node(TT::IF, "if", NT::IF_ELSE);
-        auto cond = make_node(TT::COMPOP, "==", NT::COMP_EXPR);
-        auto x = make_node(TT::ID, "x", NT::TOKEN);
-        auto tr= make_node(TT::BOOLVAL, "true", NT::TOKEN);
+        auto test = make_node(TT::START, "");
+        auto if_expr= make_node(TT::IF, "if");
+        auto cond = make_node(TT::COMPOP, "==");
+        auto x = make_node(TT::ID, "x");
+        auto tr= make_node(TT::BOOLVAL, "true");
         cond->add(x);
         cond->add(tr);
         if_expr->add(cond);
-        auto body = make_node(TT::START, "", NT::MULTIPLE_SEGMENTS);
+        auto body = make_node(TT::MULTIPLE_SEGMENTS, "");
 
-        auto t1 = make_node(TT::TEXT, " text1 ", NT::TOKEN);
+        auto t1 = make_node(TT::TEXT, " text1 ");
 
-        auto Wif_expr= make_node(TT::IF, "if", NT::IF);
-        auto Wcond = make_node(TT::COMPOP, ">", NT::COMP_EXPR);
-        auto Wx = make_node(TT::ID, "y", NT::TOKEN);
-        auto Wtr= make_node(TT::NUMBER, "0", NT::TOKEN);
+        auto Wif_expr= make_node(TT::IF, "if");
+        auto Wcond = make_node(TT::COMPOP, ">");
+        auto Wx = make_node(TT::ID, "y");
+        auto Wtr= make_node(TT::NUMBER, "0");
         Wcond->add(Wx);
         Wcond->add(Wtr);
         Wif_expr->add(Wcond);
-        auto Wbody = make_node(TT::START, "", NT::MULTIPLE_SEGMENTS);
-        auto Wt = make_node(TT::TEXT, " text2 ", NT::TOKEN);
+        auto Wbody = make_node(TT::MULTIPLE_SEGMENTS, "");
+        auto Wt = make_node(TT::TEXT, " text2 ");
         Wbody->add(Wt);
-        auto Wendif = make_node(TT::ENDIF, "endif", NT::TOKEN);
+        auto Wendif = make_node(TT::ENDIF, "endif");
         Wif_expr->add(Wbody);
         Wif_expr->add(Wendif);
 
         body->add(t1);
         body->add(Wif_expr);
-        auto t3 = make_node(TT::TEXT, " text3 ", NT::TOKEN);
+        auto t3 = make_node(TT::TEXT, " text3 ");
         body->add(t3);
 
-        auto el = make_node(TT::ELSE, "else", NT::ELSE);
-        auto body2 = make_node(TT::START, "", NT::MULTIPLE_SEGMENTS);
-        auto t2 = make_node(TT::TEXT, " text4 ", NT::TOKEN);
+        auto el = make_node(TT::ELSE, "else");
+        auto body2 = make_node(TT::MULTIPLE_SEGMENTS, "");
+        auto t2 = make_node(TT::TEXT, " text4 ");
         body2->add(t2);
-        auto endif = make_node(TT::ENDELSE, "endelse", NT::TOKEN);
+        auto endif = make_node(TT::ENDELSE, "endelse");
         if_expr->add(body);
         el->add(body2);
         el->add(endif);
@@ -684,37 +683,37 @@ BOOST_FIXTURE_TEST_SUITE(parse_tests_suite, P)
         auto result = parser.root();
 
 
-        auto test = make_node(TT::START, "", NT::START);
-        auto if_expr= make_node(TT::IF, "if", NT::IF);
-        auto and_expr = make_node(TT::LOGICOP, "and", NT::AND_EXPR);
-        auto cond = make_node(TT::COMPOP, "==", NT::COMP_EXPR);
-        auto x = make_node(TT::ID, "x", NT::TOKEN);
-        auto tr= make_node(TT::BOOLVAL, "true", NT::TOKEN);
+        auto test = make_node(TT::START, "");
+        auto if_expr= make_node(TT::IF, "if");
+        auto and_expr = make_node(TT::LOGICOP, "and");
+        auto cond = make_node(TT::COMPOP, "==");
+        auto x = make_node(TT::ID, "x");
+        auto tr= make_node(TT::BOOLVAL, "true");
         cond->add(x);
         cond->add(tr);
 
         and_expr->add(cond);
 
 
-        auto or_expr = make_node(TT::LOGICOP, "or", NT::OR_EXPR);
-        auto cond2 = make_node(TT::COMPOP, ">", NT::COMP_EXPR);
-        auto y = make_node(TT::ID, "y", NT::TOKEN);
-        auto zero= make_node(TT::NUMBER, "0", NT::TOKEN);
+        auto or_expr = make_node(TT::LOGICOP, "or");
+        auto cond2 = make_node(TT::COMPOP, ">");
+        auto y = make_node(TT::ID, "y");
+        auto zero= make_node(TT::NUMBER, "0");
         cond2->add(y);
         cond2->add(zero);
         or_expr->add(cond2);
-        auto not_expr = make_node(TT::LOGICOP, "not", NT::NOT_EXPR);
-        auto v = make_node(TT::BOOLVAL, "true", NT::TOKEN);
+        auto not_expr = make_node(TT::LOGICOP, "not");
+        auto v = make_node(TT::BOOLVAL, "true");
         not_expr->add(v);
         or_expr->add(not_expr);
         and_expr->add(or_expr);
 
         if_expr->add(and_expr);
 
-        auto body = make_node(TT::START, "", NT::MULTIPLE_SEGMENTS);
-        auto t = make_node(TT::TEXT, " text1 ", NT::TOKEN);
+        auto body = make_node(TT::MULTIPLE_SEGMENTS, "");
+        auto t = make_node(TT::TEXT, " text1 ");
         body->add(t);
-        auto endif = make_node(TT::ENDIF, "endif", NT::TOKEN);
+        auto endif = make_node(TT::ENDIF, "endif");
         if_expr->add(body);
         if_expr->add(endif);
 

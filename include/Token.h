@@ -1,11 +1,9 @@
-
 #ifndef TKOM_TOKEN_H
 #define TKOM_TOKEN_H
 
 #include <string>
 #include <memory>
 #include "Source.h"
-
 
 enum class TokenType
 {
@@ -33,7 +31,8 @@ enum class TokenType
     TEXT,
     TYPE,
     EOFT,
-    START
+    START,
+    MULTIPLE_SEGMENTS
 };
 
 class Token

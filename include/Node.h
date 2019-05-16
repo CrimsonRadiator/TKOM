@@ -7,36 +7,15 @@
 
 #include "Token.h"
 
-enum class NodeType
-{
-    START,
-    WHILE_LOOP,
-    FOR_LOOP,
-    IF,
-    IF_ELSE,
-    ELSE,
-    TOKEN,
-    DECLARATION,
-    STATEMENT,
-    MULTIPLE_SEGMENTS,
-    NOT_EXPR,
-    AND_EXPR,
-    OR_EXPR,
-    MATH_EXPR,
-    COMP_EXPR
-};
-
-
 class Node
 {
 public:
 
-    Node(const Token &token_) : type{NodeType::TOKEN}, newline{false}, token{token_}
+    Node(const Token &token_) :  newline{false}, token{token_}
     {
     }
 
 
-    NodeType type;
     bool newline;
     Token token;
     std::vector<std::unique_ptr<Node>> children;

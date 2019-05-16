@@ -2,7 +2,6 @@
 
 
 typedef TokenType TT;
-typedef NodeType NT;
 typedef std::unique_ptr<Node> NP;
 
 void Parser::nextSymbol()
@@ -32,7 +31,6 @@ NP Parser::accept(TT type, const std::string &val)
 NP Parser::root()
 {
     auto root = accept(TT::START);
-    root->type = NT::START;
     while (auto seg = segment())
     {
         root->add(seg);
@@ -44,9 +42,7 @@ NP Parser::root()
 
 NP Parser::multipleSegments()
 {
-    auto segments = std::make_unique<Node>(Token(TT::START, ""));
-    segments->type = NT::MULTIPLE_SEGMENTS;
-
+    auto segments = std::make_unique<Node>(Token(TT::MULTIPLE_SEGMENTS, ""));
     while (auto seg = segment())
     {
         segments->add(seg);
@@ -81,14 +77,12 @@ NP Parser::segment()
     auto seg = accept(TT::TEXT);
     if (seg)
     {
-        seg->type = NT::TOKEN;
         return seg;
     }
     if (!(seg = accept(TT::OPTEMPLATE)))
         return nullptr;
     else if (seg = forExpr())
     {
-        seg->type = NT::FOR_LOOP;
         auto body = multipleSegments();
         if (!body)
             return nullptr;
@@ -105,7 +99,6 @@ NP Parser::segment()
     }
     else if ((seg = whileExpr()))
     {
-        seg->type = NT::WHILE_LOOP;
         auto body = multipleSegments();
         if (!body)
             return nullptr;
@@ -122,7 +115,6 @@ NP Parser::segment()
     }
     else if ((seg = ifExpr()))
     {
-        seg->type = NT::IF;
         auto body = multipleSegments();
         if (!body)
             return nullptr;
@@ -131,8 +123,6 @@ NP Parser::segment()
         if (!middle)
         {
             middle = keywordSkip(TT::ELSE);
-            if (middle)
-                middle->type = NT::ELSE;
             if (!middle)
             {
                 middle = keywordSkip(TT::ENDIF);
@@ -142,7 +132,6 @@ NP Parser::segment()
                 return seg;
             }
         }
-        seg->type = NT::IF_ELSE;
         body = multipleSegments();
         if (!body)
             return nullptr;
@@ -160,7 +149,6 @@ NP Parser::segment()
     }
     else if ((seg = expr()))
     {
-        seg->type = NT::STATEMENT;
         if (!endTemplate(seg))
             return seg;
         return seg;
@@ -213,7 +201,6 @@ NP Parser::compoundExpr()
         if (!child)
             return nullptr;
         not_expr->add(child);
-        not_expr->type = NT::NOT_EXPR;
         return not_expr;
     }
     //compound expression
@@ -228,22 +215,13 @@ NP Parser::compoundExpr()
 
         auto op = accept(TT::LOGICOP, "and");
         if (op)
-        {
-            op->type = NT::AND_EXPR;
-        }
+        {}
         else if (op = accept(TT::LOGICOP, "or"))
-        {
-            op->type = NT::OR_EXPR;
-        }
+        {}
         else if (op = accept(TT::MATHOP))
-        {
-            op->type = NT::MATH_EXPR;
-        }
+        {}
         else if (op = accept(TT::COMPOP))
-        {
-            op->type = NT::COMP_EXPR;
-
-        }
+        {}
 
         tmp = accept(TT::OPBRACKET);
         if (!tmp)
@@ -276,7 +254,6 @@ NP Parser::expr()
             return nullptr;
         mathop->add(x);
         mathop->add(y);
-        mathop->type = NT::MATH_EXPR;
         return mathop;
     }
     auto logicop = accept(TT::COMPOP);
@@ -287,7 +264,6 @@ NP Parser::expr()
             return nullptr;
         logicop->add(x);
         logicop->add(y);
-        logicop->type = NT::COMP_EXPR;
         return logicop;
     }
 
@@ -311,7 +287,6 @@ NP Parser::declaration()
     op->add(x);
     op->add(y);
     type->add(op);
-    type->type = NT::DECLARATION;
     if (!endTemplate(type))
         return nullptr;
 
@@ -351,7 +326,6 @@ NP Parser::forExpr()
     auto x = accept(TT::ID);
     if (!x)
         return nullptr;
-    x->type = NT::TOKEN;
     auto in = accept(TT::IN);
     if (!in)
         return nullptr;

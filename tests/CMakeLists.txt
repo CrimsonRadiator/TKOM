@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.7)
 project(TKOMtests)
 
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 17)
 #boost
 enable_testing()
 find_package(Boost COMPONENTS unit_test_framework REQUIRED)

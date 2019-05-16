@@ -1,5 +1,6 @@
 
 #include <SymbolTable.h>
+#include <Token.h>
 
 #include "SymbolTable.h"
 #include "Logger.h"
@@ -107,7 +108,7 @@ int SymbolTable::evaluateExpression(const Node &expr)
 void SymbolTable::add(const Node &root)
 {
 
-    if (root.type == NodeType::DECLARATION)
+    if (root.children[0]->token.getType() == TokenType::ASSIGNOP)
     {
         auto &variable = root.children[0]->children[0]->token;
         auto &value = root.children[0]->children[1]->token;

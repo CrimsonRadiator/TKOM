@@ -25,8 +25,6 @@ public:
 
     std::unique_ptr<Node> root();
 
-    std::unique_ptr<Node> statement();
-
     std::unique_ptr<Node> multipleSegments();
 
     std::unique_ptr<Node> forExpr();
@@ -34,8 +32,6 @@ public:
     std::unique_ptr<Node> whileExpr();
 
     std::unique_ptr<Node> ifExpr();
-
-    std::unique_ptr<Node> compoundLogicExpr();
 
     std::unique_ptr<Node> compoundExpr();
 
