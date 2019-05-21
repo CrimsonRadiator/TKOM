@@ -35,11 +35,49 @@ enum class TokenType
     MULTIPLE_SEGMENTS
 };
 
+enum class ValueType{
+    INTEGER,
+    BOOLEAN,
+    STRING
+};
+
+struct Value{
+    Value(const Value& value_) : valueType{value_.valueType}
+    {
+        switch(value_.valueType)
+        {
+            case ValueType::STRING:
+                str = value_.str; break;
+            case ValueType::INTEGER:
+                integer = value_.integer; break;
+            case ValueType::BOOLEAN:
+                boolean = value_.boolean; break;
+        }
+    }
+
+    explicit Value(const std::string& str_) : valueType{ValueType::STRING}, str{str_}
+        {}
+    explicit Value(int integer_) : valueType{ValueType::INTEGER}, integer{integer_}
+        {}
+    explicit Value(bool boolean_) : valueType{ValueType::BOOLEAN}, boolean{boolean_}
+        {}
+
+    ValueType valueType;
+
+    std::string str;
+    int integer;
+    bool boolean;
+
+};
+
 class Token
 {
 public:
     //TODO: another constructor for constant text
-    Token(TokenType t, std::string text_) : type{t}, text{text_} //TODO: don't copy string
+    Token(TokenType t, const Value& value_) : type{t}, value{value_} //TODO: don't copy string
+    {};
+
+    Token(TokenType t, const std::string& str_) :type{t}, value{str_}
     {};
 
     TokenType getType() const
@@ -49,12 +87,19 @@ public:
 
     std::string getText() const
     {
-        return text;
+        if(value.valueType == ValueType::STRING)
+            return value.str;
+
+        if(value.valueType == ValueType::STRING)
+            return std::to_string(value.integer);
+
+        if(value.valueType == ValueType::BOOLEAN)
+            return value.boolean ? "true" : "false";
     }
 
 private:
     TokenType type;
-    std::string text;
+    Value value;
 };
 
 

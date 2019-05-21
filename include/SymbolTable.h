@@ -10,15 +10,6 @@
 
 using json = nlohmann::json;
 
-enum class ValueType
-{
-    INTEGER,
-    BOOLEAN,
-    STRING
-};
-
-typedef std::pair<const std::string, ValueType> svp;
-
 
 class SymbolTable
 {
@@ -33,7 +24,7 @@ public:
     int evaluateExpression(const Node &expr);
 
 private:
-    std::unordered_map<std::string, svp> symbols;
+    std::unordered_map<std::string, Value> symbols;
     JsonDeserializer jd;
 };
 

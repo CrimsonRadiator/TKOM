@@ -7,6 +7,7 @@
 
 int SymbolTable::evaluateExpression(const Node &expr)
 {
+    /*
     auto &t = expr.token;
     if (t.getType() == TokenType::COMPOP)
     {
@@ -68,9 +69,10 @@ int SymbolTable::evaluateExpression(const Node &expr)
         auto it = symbols.find(t.getText());
         if (it == symbols.end())
         {
-            if (!jd.getValueFromString(t.getText()).empty())
+            std::string ret = jd.getValueFromString(t.getText());
+            if(!ret.empty())
             {
-                //TODO: Return value;
+                return std::stoi(ret);
             }
             //ERROR
             //TODO: Add logger info about error.
@@ -102,12 +104,13 @@ int SymbolTable::evaluateExpression(const Node &expr)
 
     //ERROR
     //TODO: Add logger info about error.
+     */
     return 0;
 }
 
 void SymbolTable::add(const Node &root)
 {
-
+/*
     if (root.children[0]->token.getType() == TokenType::ASSIGNOP)
     {
         auto &variable = root.children[0]->children[0]->token;
@@ -133,11 +136,11 @@ void SymbolTable::add(const Node &root)
         else
         {
             //TODO: return pair (value, type).
-            //symbols[name] = std::make_pair(evaluateExpression(*(root.children[0]->children[1])), ValueType::INTEGER);
+            symbols[name] = std::make_pair(evaluateExpression(*(root.children[0]->children[1])));
         }
         return;
     }
     for (auto &child : root.children)
         add(*child);
-
+*/
 }
