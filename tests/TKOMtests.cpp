@@ -12,7 +12,6 @@
 #include "JsonDeserializer.h"
 
 
-typedef std::pair<std::string, std::string> PSS;
 typedef TokenType TT;
 typedef std::unique_ptr<Node> NP;
 
@@ -24,6 +23,20 @@ namespace std {
         os << pss.first << " " << pss.second;
         return os;
     }
+
+    std::ostream &operator<<(std::ostream &os,
+                            const std::pair<std::string, TokenValue> & stv) {
+        switch(stv.second.valueType){
+            case TokenValueType::STRING:
+                os << stv.first << " " << stv.second.str; break;
+            case TokenValueType::INTEGER:
+                os << stv.first << " " << stv.second.integer; break;
+            case TokenValueType::BOOLEAN:
+                os << stv.first << " " << std::boolalpha<<stv.second.boolean; break;
+        }
+        return os;
+    }
+
 
 }
 
@@ -81,15 +94,15 @@ public:
             ++counter;
             if(print)
                 std::cout<<scanner.getTypeName(t)<<" : "<<t.getText()<<std::endl;
-            resultTokens.emplace_back(std::make_pair(scanner.getTypeName(t), t.getText()));
+            resultTokens.emplace_back(std::make_pair(scanner.getTypeName(t), t.getValue()));
         }
         return counter;
     }
 
     ~F() = default;
 
-    std::vector<std::pair<std::string, std::string>> resultTokens;
-    std::vector<std::pair<std::string, std::string>> testTokens;
+    std::vector<std::pair<std::string, TokenValue>> resultTokens;
+    std::vector<std::pair<std::string, TokenValue>> testTokens;
     FakeSource source;
     Scanner scanner;
     unsigned counter;
@@ -115,7 +128,21 @@ NP make_node(TT ttype, const std::string& str){
     return result;
 }
 
+NP make_node(TT ttype, const char* chars_){
+    NP result = std::make_unique<Node>(Token(ttype, std::string(chars_)));
+    return result;
+}
 
+
+NP make_node(TT ttype, int integer){
+    NP result = std::make_unique<Node>(Token(ttype, integer));
+    return result;
+}
+
+NP make_node(TT ttype, bool boolean){
+    NP result = std::make_unique<Node>(Token(ttype, boolean));
+    return result;
+}
 bool operator != (const Node &L, const Node &R);
 
 bool operator == (const Node &L, const Node &R)
@@ -149,7 +176,7 @@ BOOST_FIXTURE_TEST_SUITE(scanner_tests_suite, F)
 
     BOOST_AUTO_TEST_CASE(oneLetter) {
         std::string str = "a";
-        testTokens.emplace_back(std::make_pair("TEXT", "a"));
+        testTokens.emplace_back(std::make_pair("TEXT", std::string("a")));
         source.loadData(str);
         BOOST_CHECK_EQUAL( read(false), 1);
         BOOST_TEST( resultTokens == testTokens, boost::test_tools::per_element() );
@@ -215,7 +242,7 @@ BOOST_FIXTURE_TEST_SUITE(scanner_tests_suite, F)
         testTokens.emplace_back(std::make_pair("TYPE", "int"));
         testTokens.emplace_back(std::make_pair("ID", "x"));
         testTokens.emplace_back(std::make_pair("ASSIGNOP", "="));
-        testTokens.emplace_back(std::make_pair("NUMBER", "10"));
+        testTokens.emplace_back(std::make_pair("NUMBER", 10));
         testTokens.emplace_back(std::make_pair("CLTEMPLATENONEW", "}}"));
 
         testTokens.emplace_back(std::make_pair("OPTEMPLATE", "{{"));
@@ -229,7 +256,7 @@ BOOST_FIXTURE_TEST_SUITE(scanner_tests_suite, F)
         testTokens.emplace_back(std::make_pair("TYPE", "bool"));
         testTokens.emplace_back(std::make_pair("ID", "z"));
         testTokens.emplace_back(std::make_pair("ASSIGNOP", "="));
-        testTokens.emplace_back(std::make_pair("BOOLVAL", "false"));
+        testTokens.emplace_back(std::make_pair<std::string, TokenValue>("BOOLVAL", TokenValue(false)));
         testTokens.emplace_back(std::make_pair("CLTEMPLATENONEW", "}}"));
 
 
@@ -244,7 +271,7 @@ BOOST_FIXTURE_TEST_SUITE(scanner_tests_suite, F)
         testTokens.emplace_back(std::make_pair("WHILE", "while"));
         testTokens.emplace_back(std::make_pair("ID", "x"));
         testTokens.emplace_back(std::make_pair("COMPOP", ">"));
-        testTokens.emplace_back(std::make_pair("NUMBER", "0"));
+        testTokens.emplace_back(std::make_pair<std::string, TokenValue>("NUMBER", TokenValue(0)));
         testTokens.emplace_back(std::make_pair("CLTEMPLATENONEW", "}}"));
         source.loadData(str);
         read(false);
@@ -270,7 +297,7 @@ BOOST_FIXTURE_TEST_SUITE(scanner_tests_suite, F)
         testTokens.emplace_back(std::make_pair("IF", "if"));
         testTokens.emplace_back(std::make_pair("ID", "x"));
         testTokens.emplace_back(std::make_pair("COMPOP", ">"));
-        testTokens.emplace_back(std::make_pair("NUMBER", "0"));
+        testTokens.emplace_back(std::make_pair<std::string, TokenValue>("NUMBER", TokenValue(0)));
         testTokens.emplace_back(std::make_pair("CLTEMPLATENONEW", "}}"));
         testTokens.emplace_back(std::make_pair("TEXT", "text1"));
         testTokens.emplace_back(std::make_pair("OPTEMPLATE", "{{"));
@@ -355,14 +382,15 @@ BOOST_FIXTURE_TEST_SUITE(scanner_tests_suite, F)
         testTokens.emplace_back(std::make_pair("OPBRACKET", "("));
         testTokens.emplace_back(std::make_pair("ID", "x"));
         testTokens.emplace_back(std::make_pair("COMPOP", ">"));
-        testTokens.emplace_back(std::make_pair("NUMBER", "0"));
+        TokenValue tv(0);
+        testTokens.emplace_back(std::pair<std::string, TokenValue>("NUMBER", tv));
         testTokens.emplace_back(std::make_pair("LOGICOP", "and"));
         testTokens.emplace_back(std::make_pair("OPBRACKET", "("));
         testTokens.emplace_back(std::make_pair("ID", "z"));
         testTokens.emplace_back(std::make_pair("MATHOP", "%"));
-        testTokens.emplace_back(std::make_pair("NUMBER", "2"));
+        testTokens.emplace_back(std::make_pair<std::string, int>("NUMBER", 2));
         testTokens.emplace_back(std::make_pair("COMPOP", "=="));
-        testTokens.emplace_back(std::make_pair("NUMBER", "4"));
+        testTokens.emplace_back(std::make_pair<std::string, int>("NUMBER", 4));
         testTokens.emplace_back(std::make_pair("CLBRACKET", ")"));
         testTokens.emplace_back(std::make_pair("CLBRACKET", ")"));
 
@@ -436,7 +464,7 @@ BOOST_FIXTURE_TEST_SUITE(parse_tests_suite, P)
         auto type = make_node(TT::TYPE, "int");
         auto eq = make_node(TT::ASSIGNOP, "=");
         auto x = make_node(TT::ID, "x");
-        auto b = make_node(TT::NUMBER, "1");
+        auto b = make_node(TT::NUMBER, 1);
         eq->add(x);
         eq->add(b);
         type->add(eq);
@@ -498,7 +526,7 @@ BOOST_FIXTURE_TEST_SUITE(parse_tests_suite, P)
         auto while_expr= make_node(TT::WHILE, "while");
         auto gt = make_node(TT::COMPOP, ">");
         auto x = make_node(TT::ID, "x");
-        auto zero = make_node(TT::NUMBER, "0");
+        auto zero = make_node(TT::NUMBER, 0);
 
         gt->add(x);
         gt->add(zero);
@@ -528,7 +556,7 @@ BOOST_FIXTURE_TEST_SUITE(parse_tests_suite, P)
         auto if_expr= make_node(TT::IF, "if");
         auto cond = make_node(TT::COMPOP, "==");
         auto x = make_node(TT::ID, "x");
-        auto tr= make_node(TT::BOOLVAL, "true");
+        auto tr= make_node(TT::BOOLVAL, true);
         cond->add(x);
         cond->add(tr);
         if_expr->add(cond);
@@ -554,7 +582,7 @@ BOOST_FIXTURE_TEST_SUITE(parse_tests_suite, P)
         auto if_expr= make_node(TT::IF, "if");
         auto cond = make_node(TT::COMPOP, "==");
         auto x = make_node(TT::ID, "x");
-        auto tr= make_node(TT::BOOLVAL, "true");
+        auto tr= make_node(TT::BOOLVAL, true);
         cond->add(x);
         cond->add(tr);
         if_expr->add(cond);
@@ -586,7 +614,7 @@ BOOST_FIXTURE_TEST_SUITE(parse_tests_suite, P)
         auto if_expr= make_node(TT::IF, "if");
         auto cond = make_node(TT::COMPOP, "==");
         auto x = make_node(TT::ID, "x");
-        auto tr= make_node(TT::BOOLVAL, "true");
+        auto tr= make_node(TT::BOOLVAL, true);
         cond->add(x);
         cond->add(tr);
         if_expr->add(cond);
@@ -595,7 +623,7 @@ BOOST_FIXTURE_TEST_SUITE(parse_tests_suite, P)
         auto Wif_expr= make_node(TT::IF, "if");
         auto Wcond = make_node(TT::COMPOP, ">");
         auto Wx = make_node(TT::ID, "y");
-        auto Wtr= make_node(TT::NUMBER, "0");
+        auto Wtr= make_node(TT::NUMBER, 0);
         Wcond->add(Wx);
         Wcond->add(Wtr);
         Wif_expr->add(Wcond);
@@ -633,7 +661,7 @@ BOOST_FIXTURE_TEST_SUITE(parse_tests_suite, P)
         auto if_expr= make_node(TT::IF, "if");
         auto cond = make_node(TT::COMPOP, "==");
         auto x = make_node(TT::ID, "x");
-        auto tr= make_node(TT::BOOLVAL, "true");
+        auto tr= make_node(TT::BOOLVAL, true);
         cond->add(x);
         cond->add(tr);
         if_expr->add(cond);
@@ -644,7 +672,7 @@ BOOST_FIXTURE_TEST_SUITE(parse_tests_suite, P)
         auto Wif_expr= make_node(TT::IF, "if");
         auto Wcond = make_node(TT::COMPOP, ">");
         auto Wx = make_node(TT::ID, "y");
-        auto Wtr= make_node(TT::NUMBER, "0");
+        auto Wtr= make_node(TT::NUMBER, 0);
         Wcond->add(Wx);
         Wcond->add(Wtr);
         Wif_expr->add(Wcond);
@@ -688,7 +716,7 @@ BOOST_FIXTURE_TEST_SUITE(parse_tests_suite, P)
         auto and_expr = make_node(TT::LOGICOP, "and");
         auto cond = make_node(TT::COMPOP, "==");
         auto x = make_node(TT::ID, "x");
-        auto tr= make_node(TT::BOOLVAL, "true");
+        auto tr= make_node(TT::BOOLVAL, true);
         cond->add(x);
         cond->add(tr);
 
@@ -698,12 +726,12 @@ BOOST_FIXTURE_TEST_SUITE(parse_tests_suite, P)
         auto or_expr = make_node(TT::LOGICOP, "or");
         auto cond2 = make_node(TT::COMPOP, ">");
         auto y = make_node(TT::ID, "y");
-        auto zero= make_node(TT::NUMBER, "0");
+        auto zero= make_node(TT::NUMBER, 0);
         cond2->add(y);
         cond2->add(zero);
         or_expr->add(cond2);
         auto not_expr = make_node(TT::LOGICOP, "not");
-        auto v = make_node(TT::BOOLVAL, "true");
+        auto v = make_node(TT::BOOLVAL, true);
         not_expr->add(v);
         or_expr->add(not_expr);
         and_expr->add(or_expr);

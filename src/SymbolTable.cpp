@@ -1,4 +1,3 @@
-
 #include <SymbolTable.h>
 #include <Token.h>
 
@@ -7,6 +6,7 @@
 
 int SymbolTable::evaluateExpression(const Node &expr)
 {
+
     auto &t = expr.token;
     if (t.getType() == TokenType::COMPOP)
     {
@@ -55,53 +55,49 @@ int SymbolTable::evaluateExpression(const Node &expr)
     }
     else if (t.getType() == TokenType::NUMBER)
     {
-        int val;
-        std::istringstream(t.getText()) >> val;
-        return val;
+        return t.getValue().integer;
     }
     else if (t.getType() == TokenType::BOOLVAL)
     {
-        return (t.getText() == "true");
+        return t.getValue().boolean;
     }
     else if (t.getType() == TokenType::ID)
     {
-        auto it = symbols.find(t.getText());
+        auto it = symbols.find(t.getValue().str);
         if (it == symbols.end())
         {
-            if (!jd.getValueFromString(t.getText()).empty())
-            {
-                //TODO: Return value;
-            }
+            TokenValue ret = jd.getValueFromString(t.getValue().str);
+            if(ret.valueType == TokenValueType::STRING)
+                return false;
+            else if(ret.valueType == TokenValueType::INTEGER)
+                return ret.integer;
+            else
+                return ret.boolean;
             //ERROR
             //TODO: Add logger info about error.
-            return 0;
         }
 
-        std::string value = it->second.first;
-        ValueType type = it->second.second;
 
-        if (type == ValueType::STRING)
+        if (it->second.valueType == TokenValueType::STRING)
         {
             //ERROR
             //TODO: Add logger info about error.
-            return 0;
+            return false;
         }
-        else if (type == ValueType::BOOLEAN)
+        else if (it->second.valueType == TokenValueType::BOOLEAN)
         {
-            return (value == "true");
+            return it->second.boolean;
         }
         else
         {
-            //string to integer conversion
-            int tmp;
-            std::istringstream(value) >> tmp;
-            return tmp;
+            return it->second.integer;
         }
 
     }
 
     //ERROR
     //TODO: Add logger info about error.
+
     return 0;
 }
 
@@ -117,7 +113,7 @@ void SymbolTable::add(const Node &root)
 
         if (value.getType() == TokenType::ID)
         {
-            auto it = symbols.find(value.getText());
+            auto it = symbols.find(value.getValue().str);
 
             if (it == symbols.end())
             {
@@ -127,13 +123,15 @@ void SymbolTable::add(const Node &root)
             else
             {
 
-                //symbols[name] = std::make_pair(it->second.first, it->second.second);
+                //SOMETHING
+                //CONSTRUCTORS?
+                symbols.emplace(name, it->second);
             }
         }
         else
         {
-            //TODO: return pair (value, type).
-            //symbols[name] = std::make_pair(evaluateExpression(*(root.children[0]->children[1])), ValueType::INTEGER);
+            //SOMETHING
+            symbols.emplace(name, TokenValue(evaluateExpression(*(root.children[0]->children[1]))));
         }
         return;
     }

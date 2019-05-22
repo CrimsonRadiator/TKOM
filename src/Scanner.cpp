@@ -130,7 +130,12 @@ Token Scanner::extractToken()
 
             //check if keyword
             if (keywords.find(text) != keywords.end())
+            {
+                if(text== "false" || text== "true")
+                    return Token(TokenType::BOOLVAL, (bool) (text=="true"));
+
                 return Token(keywords[text], text);
+            }
 
             //check if EOF
             if (source.getCurr() == EOF)
@@ -150,6 +155,7 @@ Token Scanner::extractToken()
         //check if digit
         if (isdigit(source.getCurr()))
         {
+
             std::string text(1, source.getCurr());
             while (source.getCurr() != EOF && isdigit(source.getCurr()))
             {
@@ -159,7 +165,8 @@ Token Scanner::extractToken()
                 return Token(TokenType::EOFT, "");
 
             text = text.substr(0, text.size() - 1); //TODO: no-copy way
-            return Token(TokenType::NUMBER, text);
+            int val = std::stoi(text);
+            return Token(TokenType::NUMBER, val);
         }
 
         std::string tmpString = {source.getCurr(), source.peekNextChar()};
@@ -169,6 +176,8 @@ Token Scanner::extractToken()
         {
             source.getNextChar();
             source.getNextChar();
+
+
             return Token(keywords[tmpString], tmpString);
         }
 
