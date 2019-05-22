@@ -18,15 +18,15 @@ int main()
 
     //std::cout<<j_data["pi"];
     JsonDeserializer deserializer(j_data);
-    std::cout << deserializer.getValueFromString("pi");
-    std::cout << deserializer.getValueFromString("answer.everything");
-    std::cout << deserializer.getValueFromString("list[2]");
+    std::cout << deserializer.getValueFromString("happy").boolean;
+    std::cout << deserializer.getValueFromString("answer.everything").integer;
+    std::cout << deserializer.getValueFromString("name").str;
 
-    Scanner scanner(src);
-    Parser parser(scanner);
+    //Scanner scanner(src);
+    //Parser parser(scanner);
     //SymbolTable symbolTable;
 
-    std::unique_ptr<Node> root = parser.root();
+    //std::unique_ptr<Node> root = parser.root();
     //symbolTable.add(*root);
 
 

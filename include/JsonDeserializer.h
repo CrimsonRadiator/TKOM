@@ -14,7 +14,9 @@ public:
     {};
 
     TokenValue getValueFromString(const std::string &str) const;
-
+    
+    TokenValue jsonToTokenValue(const json& j) const;
+    
 private:
     json json_data;
 };

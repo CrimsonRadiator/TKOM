@@ -3,6 +3,17 @@
 #include <sstream>
 #include <iostream>
 
+TokenValue JsonDeserializer::jsonToTokenValue(const json& j) const {
+    if(j.is_boolean())
+        return TokenValue((bool)j);
+    if(j.is_number_integer())
+        return TokenValue((int)j);
+    if(j.is_string())
+        return TokenValue(j.get<std::string>());
+    //error
+    //TODO: Logger
+    return TokenValue(false);
+}
 
 TokenValue JsonDeserializer::getValueFromString(const std::string &str) const
 {
@@ -38,7 +49,7 @@ TokenValue JsonDeserializer::getValueFromString(const std::string &str) const
             if (it == str.end())
             {
                 //TODO: out of range check, type check
-                return TokenValue(j[index_number].dump());
+                return jsonToTokenValue(j[object_string]);
             }
 
             //TODO: out of range check
@@ -55,7 +66,7 @@ TokenValue JsonDeserializer::getValueFromString(const std::string &str) const
                     return TokenValue("");
                 }
                 //TODO:: type check
-                return TokenValue(j[object_string].dump());
+                return jsonToTokenValue(j[object_string]);
             }
 
             if (!j.contains(object_string))
@@ -78,5 +89,5 @@ TokenValue JsonDeserializer::getValueFromString(const std::string &str) const
         return TokenValue("");
     }
     //TODO:: type check;
-    return TokenValue(j[object_string].dump());
+    return jsonToTokenValue(j[object_string]);
 }
