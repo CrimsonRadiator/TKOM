@@ -4,7 +4,7 @@
 #include <iostream>
 
 
-std::string JsonDeserializer::getValueFromString(const std::string &str) const
+TokenValue JsonDeserializer::getValueFromString(const std::string &str) const
 {
     std::string object_string;
     json j(json_data);
@@ -18,7 +18,7 @@ std::string JsonDeserializer::getValueFromString(const std::string &str) const
             if (!j.contains(object_string))
             {
                 //TODO: Logger
-                return "";
+                return TokenValue("");
             }
             j = j[object_string];
 
@@ -37,8 +37,8 @@ std::string JsonDeserializer::getValueFromString(const std::string &str) const
 
             if (it == str.end())
             {
-                //TODO: out of range check
-                return j[index_number].dump();
+                //TODO: out of range check, type check
+                return TokenValue(j[index_number].dump());
             }
 
             //TODO: out of range check
@@ -52,15 +52,16 @@ std::string JsonDeserializer::getValueFromString(const std::string &str) const
                 if (!j.contains(object_string))
                 {
                     //TODO: Logger
-                    return "";
+                    return TokenValue("");
                 }
-                return j[object_string].dump();
+                //TODO:: type check
+                return TokenValue(j[object_string].dump());
             }
 
             if (!j.contains(object_string))
             {
                 //TODO: Logger
-                return "";
+                return TokenValue("");
             }
             j = j[object_string];
             object_string.clear();
@@ -74,7 +75,8 @@ std::string JsonDeserializer::getValueFromString(const std::string &str) const
     if (!j.contains(object_string))
     {
         //TODO: Logger
-        return "";
+        return TokenValue("");
     }
-    return j[object_string].dump();
+    //TODO:: type check;
+    return TokenValue(j[object_string].dump());
 }

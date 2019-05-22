@@ -1,7 +1,3 @@
-//
-// Created by ccc on 4/4/19.
-//
-
 #include "Source.h"
 
 char Source::getNextChar()

@@ -2,6 +2,7 @@
 #define TKOM_JSONDESERIALIZER_H
 
 #include "json.h"
+#include <Token.h>
 
 using json = nlohmann::json;
 
@@ -12,7 +13,7 @@ public:
     explicit JsonDeserializer(const json &json_data_) : json_data{json_data_}
     {};
 
-    std::string getValueFromString(const std::string &str) const;
+    TokenValue getValueFromString(const std::string &str) const;
 
 private:
     json json_data;

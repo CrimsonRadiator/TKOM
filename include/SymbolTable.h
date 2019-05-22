@@ -24,7 +24,7 @@ public:
     int evaluateExpression(const Node &expr);
 
 private:
-    std::unordered_map<std::string, Value> symbols;
+    std::unordered_map<std::string, TokenValue> symbols;
     JsonDeserializer jd;
 };
 
