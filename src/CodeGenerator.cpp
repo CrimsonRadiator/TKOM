@@ -1,10 +1,10 @@
-#include <SymbolTable.h>
+#include <CodeGenerator.h>
 #include <Token.h>
 
-#include "SymbolTable.h"
+#include "CodeGenerator.h"
 #include "Logger.h"
 
-int SymbolTable::evaluateExpression(const Node &expr)
+int CodeGenerator::evaluateExpression(const Node &expr)
 {
 
     auto &t = expr.token;
@@ -73,8 +73,6 @@ int SymbolTable::evaluateExpression(const Node &expr)
                 return ret.integer;
             else
                 return ret.boolean;
-            //ERROR
-            //TODO: Add logger info about error.
         }
 
 
@@ -101,41 +99,35 @@ int SymbolTable::evaluateExpression(const Node &expr)
     return 0;
 }
 
-void SymbolTable::add(const Node &root)
+void CodeGenerator::generate(const Node &root)
 {
+    TokenType type = root.token.getType();
+    TokenValue value = root.token.getValue();
 
-    if (root.children[0]->token.getType() == TokenType::ASSIGNOP)
+    switch(type)
     {
-        auto &variable = root.children[0]->children[0]->token;
-        auto &value = root.children[0]->children[1]->token;
-
-        std::string name = variable.getText();
-
-        if (value.getType() == TokenType::ID)
-        {
-            auto it = symbols.find(value.getValue().str);
-
-            if (it == symbols.end())
+        case TokenType::MULTIPLE_SEGMENTS:
+            for (auto& c : root.children)
+                generate(*c);
+            break;
+        case TokenType::IF:
+            if(evaluateExpression(*root.children[0]))
             {
-                //TODO::Logging
-                //Logger::getInstance().logUndefinedSymbol(it->second.first);
+                generate(*root.children[1]);
             }
-            else
+            else if(root.children[2]->token.getType() == TokenType::ELSE)
             {
-
-                //SOMETHING
-                //CONSTRUCTORS?
-                symbols.emplace(name, it->second);
+                generate(*(root.children[2]->children[0]));
             }
-        }
-        else
-        {
-            //SOMETHING
-            symbols.emplace(name, TokenValue(evaluateExpression(*(root.children[0]->children[1]))));
-        }
-        return;
+            break;
+        case TokenType::WHILE:
+            while(evaluateExpression(*root.children[0]))
+            {
+               generate(*root.children[1]);
+            }
+            break;
+        case TokenType::FOR:
+            //CHECK FOR
+            break;
     }
-    for (auto &child : root.children)
-        add(*child);
-
 }

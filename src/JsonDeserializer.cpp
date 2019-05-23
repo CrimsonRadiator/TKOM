@@ -4,10 +4,10 @@
 #include <iostream>
 
 TokenValue JsonDeserializer::jsonToTokenValue(const json& j) const {
-    if(j.is_boolean())
-        return TokenValue((bool)j);
     if(j.is_number_integer())
         return TokenValue((int)j);
+    if(j.is_boolean())
+        return TokenValue((bool)j);
     if(j.is_string())
         return TokenValue(j.get<std::string>());
     //error
@@ -15,7 +15,7 @@ TokenValue JsonDeserializer::jsonToTokenValue(const json& j) const {
     return TokenValue(false);
 }
 
-TokenValue JsonDeserializer::getValueFromString(const std::string &str) const
+json JsonDeserializer::getJsonFromString(const std::string &str) const
 {
     std::string object_string;
     json j(json_data);
@@ -29,7 +29,7 @@ TokenValue JsonDeserializer::getValueFromString(const std::string &str) const
             if (!j.contains(object_string))
             {
                 //TODO: Logger
-                return TokenValue("");
+                return json();
             }
             j = j[object_string];
 
@@ -49,7 +49,7 @@ TokenValue JsonDeserializer::getValueFromString(const std::string &str) const
             if (it == str.end())
             {
                 //TODO: out of range check, type check
-                return jsonToTokenValue(j[object_string]);
+                return j[object_string];
             }
 
             //TODO: out of range check
@@ -63,16 +63,16 @@ TokenValue JsonDeserializer::getValueFromString(const std::string &str) const
                 if (!j.contains(object_string))
                 {
                     //TODO: Logger
-                    return TokenValue("");
+                    return json();
                 }
                 //TODO:: type check
-                return jsonToTokenValue(j[object_string]);
+                return j[object_string];
             }
 
             if (!j.contains(object_string))
             {
                 //TODO: Logger
-                return TokenValue("");
+                return json();
             }
             j = j[object_string];
             object_string.clear();
@@ -86,8 +86,31 @@ TokenValue JsonDeserializer::getValueFromString(const std::string &str) const
     if (!j.contains(object_string))
     {
         //TODO: Logger
-        return TokenValue("");
+        return json();
     }
     //TODO:: type check;
-    return jsonToTokenValue(j[object_string]);
+    return j[object_string];
+
 }
+
+TokenValue JsonDeserializer::getValueFromString(const std::string &str) const
+{
+   return jsonToTokenValue(getJsonFromString(str));
+}
+
+std::vector<TokenValue> JsonDeserializer::getVectorFromString(const std::string& str) const
+{
+    json j = getJsonFromString(str);
+    std::vector<TokenValue> result;
+    if(j.is_array())
+    {
+        for(auto e : j)
+        {
+            result.push_back(jsonToTokenValue(e));
+        }
+    }
+    return result;
+
+}
+
+

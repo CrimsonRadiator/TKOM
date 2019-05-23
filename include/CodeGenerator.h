@@ -11,15 +11,13 @@
 using json = nlohmann::json;
 
 
-class SymbolTable
+class CodeGenerator
 {
 public:
-    SymbolTable(json data_) : jd{data_}
+    CodeGenerator(json data_) : jd{data_}
     {};
 
-    void add(const Node &root);
-
-    void add(json &j);
+    void generate(const Node &root);
 
     int evaluateExpression(const Node &expr);
 

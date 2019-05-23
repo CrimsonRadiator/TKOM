@@ -6,7 +6,7 @@
 
 
 #include "Scanner.h"
-#include "SymbolTable.h"
+#include "CodeGenerator.h"
 
 
 Token Scanner::getNextToken()

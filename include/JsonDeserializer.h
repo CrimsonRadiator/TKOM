@@ -2,7 +2,8 @@
 #define TKOM_JSONDESERIALIZER_H
 
 #include "json.h"
-#include <Token.h>
+#include "Token.h"
+#include <vector>
 
 using json = nlohmann::json;
 
@@ -14,11 +15,14 @@ public:
     {};
 
     TokenValue getValueFromString(const std::string &str) const;
-    
-    TokenValue jsonToTokenValue(const json& j) const;
-    
+
+    std::vector<TokenValue> getVectorFromString(const std::string& j) const;
+
 private:
     json json_data;
+    TokenValue jsonToTokenValue(const json& j) const;
+    json getJsonFromString(const std::string& str) const;
+
 };
 
 
