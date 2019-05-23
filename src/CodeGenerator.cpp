@@ -158,11 +158,12 @@ void CodeGenerator::generate(const Node &root)
             break;
         case TokenType::FOR:
             {
-            auto var_name = root.children[2]->token.getText();
-            for(auto e : jd.getVectorFromString(var_name))
+            auto var_name = root.children[1]->token.getText();
+            auto list_name = root.children[2]->token.getText();
+            for(auto e : jd.getVectorFromString(list_name))
             {
                 symbols[var_name] = e;
-                generate(*root.children[1]);
+                generate(*root.children[3]);
             }
             break;
         }
@@ -183,6 +184,7 @@ void CodeGenerator::generate(const Node &root)
                 TokenValue ret = jd.getValueFromString(var_name);
                 printTokenValue(ret);
             }
+            printTokenValue(it->second);
             break;
         }
         default:
