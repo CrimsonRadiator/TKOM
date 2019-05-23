@@ -4,6 +4,22 @@
 #include "CodeGenerator.h"
 #include "Logger.h"
 
+void CodeGenerator::printTokenValue(const TokenValue& tv) const
+{
+    switch (tv.valueType)
+    {
+        case TokenValueType::STRING:
+            std::cout << tv.str;
+            break;
+        case TokenValueType::INTEGER:
+            std::cout << tv.integer;
+            break;
+        case TokenValueType::BOOLEAN:
+            std::cout << tv.boolean;
+            break;
+    }
+}
+
 int CodeGenerator::evaluateExpression(const Node &expr)
 {
 
@@ -67,12 +83,22 @@ int CodeGenerator::evaluateExpression(const Node &expr)
         if (it == symbols.end())
         {
             TokenValue ret = jd.getValueFromString(t.getValue().str);
+
             if(ret.valueType == TokenValueType::STRING)
+            {
+                //std::cout<<"STRING "<<ret.str;
                 return false;
+            }
             else if(ret.valueType == TokenValueType::INTEGER)
+            {
+                //std::cout<<"INTEGER "<<ret.integer;
                 return ret.integer;
+            }
             else
+            {
+                //std::cout<<"BOOLEAN "<<ret.boolean;
                 return ret.boolean;
+            }
         }
 
 
@@ -106,6 +132,10 @@ void CodeGenerator::generate(const Node &root)
 
     switch(type)
     {
+        case TokenType::START:
+            for(auto& c : root.children)
+                generate(*c);
+            break;
         case TokenType::MULTIPLE_SEGMENTS:
             for (auto& c : root.children)
                 generate(*c);
@@ -127,7 +157,36 @@ void CodeGenerator::generate(const Node &root)
             }
             break;
         case TokenType::FOR:
-            //CHECK FOR
+            {
+            auto var_name = root.children[2]->token.getText();
+            for(auto e : jd.getVectorFromString(var_name))
+            {
+                symbols[var_name] = e;
+                generate(*root.children[1]);
+            }
+            break;
+        }
+        case TokenType::TYPE:
+        {
+            auto var_name = root.children[0]->children[0]->token.getText();
+            auto var_value = evaluateExpression(*(root.children[0]->children[1]));
+
+            symbols[var_name] = TokenValue(var_value);
+            break;
+        }
+        case TokenType::ID:
+        {
+            std::string var_name = root.token.getValue().str;
+            auto it = symbols.find(var_name);
+            if(it == symbols.end())
+            {
+                TokenValue ret = jd.getValueFromString(var_name);
+                printTokenValue(ret);
+            }
+            break;
+        }
+        default:
+            printTokenValue(value);
             break;
     }
 }

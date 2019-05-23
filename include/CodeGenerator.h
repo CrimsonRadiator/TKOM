@@ -24,6 +24,7 @@ public:
 private:
     std::unordered_map<std::string, TokenValue> symbols;
     JsonDeserializer jd;
+    void printTokenValue(const TokenValue& t) const;
 };
 
 

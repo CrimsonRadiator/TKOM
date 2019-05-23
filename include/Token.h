@@ -44,6 +44,8 @@ enum class TokenValueType{
 struct TokenValue{
     //TODO: assign constructor
 
+    TokenValue() = default;
+
     TokenValue(const TokenValue& value_) : valueType{value_.valueType}
     {
         switch(value_.valueType)

@@ -23,9 +23,10 @@ int main()
 
     Scanner scanner(src);
     Parser parser(scanner);
-    CodeGenerator symbolTable(j_data);
+    CodeGenerator generator(j_data);
     std::unique_ptr<Node> root = parser.root();
-    //symbolTable.add(*root);
+
+    generator.generate(*root);
 
     if(root->children.empty())
         return 1;
