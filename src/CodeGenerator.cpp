@@ -184,7 +184,8 @@ void CodeGenerator::generate(const Node &root)
                 TokenValue ret = jd.getValueFromString(var_name);
                 printTokenValue(ret);
             }
-            printTokenValue(it->second);
+            else
+                printTokenValue(it->second);
             break;
         }
         default:
