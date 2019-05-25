@@ -32,7 +32,8 @@ enum class TokenType
     TYPE,
     EOFT,
     START,
-    MULTIPLE_SEGMENTS
+    MULTIPLE_SEGMENTS,
+    TEMPLATE_TEXT
 };
 
 enum class TokenValueType{

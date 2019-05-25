@@ -308,6 +308,9 @@ NP Parser::value()
     {
         return x;
     }
+    else if((x = accept(TT::TEMPLATE_TEXT))){
+        return x;
+    }
 
     return nullptr;
 

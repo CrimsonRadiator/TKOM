@@ -422,6 +422,18 @@ BOOST_FIXTURE_TEST_SUITE(scanner_tests_suite, F)
         BOOST_TEST(resultTokens == testTokens, boost::test_tools::per_element());
     }
 
+    BOOST_AUTO_TEST_CASE(templateText){
+        std::string str = "{{ \"template_tex t\" }}";
+        testTokens.emplace_back(std::make_pair("OPTEMPLATE", "{{"));
+        testTokens.emplace_back(std::make_pair("TEMPLATE_TEXT", "template_tex t"));
+        testTokens.emplace_back(std::make_pair("CLTEMPLATENONEW", "}}"));
+
+        source.loadData(str);
+        read(false);
+        BOOST_TEST(resultTokens == testTokens, boost::test_tools::per_element());
+    }
+
+
     BOOST_AUTO_TEST_CASE(randomToken){
         std::string str = "{#$%^&*(YUH{{]]}}GDUOIA intadd {}{}{}[][}{][]{()";
         source.loadData(str);
