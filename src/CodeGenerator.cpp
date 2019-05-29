@@ -20,53 +20,121 @@ void CodeGenerator::printTokenValue(const TokenValue& tv) const
     }
 }
 
-int CodeGenerator::evaluateExpression(const Node &expr)
+bool CodeGenerator::evaluateStringComparison(const Node& lhs, const Node& rhs, const Token& t) const {
+   std::string lhs_str = lhs.token.getValue().str;
+   std::string rhs_str = rhs.token.getValue().str;
+
+   if(lhs.token.getType()==TokenType::ID)
+   {
+       auto it = symbols.find(lhs.token.getValue().str);
+       if (it == symbols.end())
+       {
+           TokenValue ret = jd.getValueFromString(lhs.token.getValue().str);
+           lhs_str = ret.str;
+       }
+       else
+           lhs_str = it->second.str;
+   }
+   if(rhs.token.getType()==TokenType::ID){
+        auto it = symbols.find(rhs.token.getValue().str);
+        if (it == symbols.end())
+        {
+            TokenValue ret = jd.getValueFromString(rhs.token.getValue().str);
+            rhs_str = ret.str;
+        }
+          else
+              rhs_str = it->second.str;
+   }
+
+
+   if (t.getText() == ">")
+        return lhs_str > rhs_str;
+    else if (t.getText() == ">=")
+        return lhs_str >= rhs_str;
+    else if (t.getText() == "<")
+        return lhs_str < rhs_str;
+    else if (t.getText() == "<=")
+        return lhs_str <= rhs_str;
+    else if (t.getText() == "==")
+        return lhs_str == rhs_str;
+    else
+        return false;
+}
+
+int CodeGenerator::evaluateExpression(const Node &expr) const
 {
 
     auto &t = expr.token;
+
     if (t.getType() == TokenType::COMPOP)
     {
+        Node& lhs = *(expr.children[0]);
+        Node& rhs = *(expr.children[1]);
+
+
+        if( (lhs.token.getType()  == TokenType::TEMPLATE_TEXT &&
+            rhs.token.getType() == TokenType::ID &&
+            rhs.token.getValue().valueType == TokenValueType::STRING) ||
+
+            (rhs.token.getType() == TokenType::TEMPLATE_TEXT &&
+            lhs.token.getType() == TokenType::ID &&
+            lhs.token.getValue().valueType == TokenValueType::STRING))
+
+            //(lhs.token.getType() == TokenType::ID &&
+            //lhs.token.getValue().valueType == TokenValueType::STRING &&
+            //rhs.token.getType() == TokenType::ID &&
+            //rhs.token.getValue().valueType == TokenValueType::STRING))
+            return evaluateStringComparison(lhs, rhs, t);
+
+
+
         if (t.getText() == ">")
-            return evaluateExpression(*(expr.children[0])) >
-                   evaluateExpression(*(expr.children[1]));
+            return evaluateExpression(lhs) >
+                   evaluateExpression(rhs);
         else if (t.getText() == ">=")
-            return evaluateExpression(*(expr.children[0])) >=
-                   evaluateExpression(*(expr.children[1]));
+            return evaluateExpression(lhs) >=
+                   evaluateExpression(rhs);
         else if (t.getText() == "<")
-            return evaluateExpression(*(expr.children[0])) <
-                   evaluateExpression(*(expr.children[1]));
+            return evaluateExpression(lhs) <
+                   evaluateExpression(rhs);
         else if (t.getText() == "<=")
-            return evaluateExpression(*(expr.children[0])) <=
-                   evaluateExpression(*(expr.children[1]));
+            return evaluateExpression(lhs) <=
+                   evaluateExpression(rhs);
         else if (t.getText() == "==")
-            return evaluateExpression(*(expr.children[0])) ==
-                   evaluateExpression(*(expr.children[1]));
+            return evaluateExpression(lhs) ==
+                   evaluateExpression(rhs);
     }
     else if (t.getType() == TokenType::LOGICOP)
     {
+        Node& lhs = *(expr.children[0]);
+        Node& rhs = *(expr.children[1]);
+
         if (t.getText() == "and")
-            return evaluateExpression(*(expr.children[0])) &&
-                   evaluateExpression(*(expr.children[1]));
+            return evaluateExpression(lhs) &&
+                   evaluateExpression(rhs);
         else if (t.getText() == "or")
-            return evaluateExpression(*(expr.children[0])) ||
-                   evaluateExpression(*(expr.children[1]));
+            return evaluateExpression(lhs) ||
+                   evaluateExpression(rhs);
         else if (t.getText() == "not")
-            return !evaluateExpression(*(expr.children[0]));
+            return !evaluateExpression(lhs);
     }
     else if (t.getType() == TokenType::MATHOP)
     {
+        Node& lhs = *(expr.children[0]);
+        Node& rhs = *(expr.children[1]);
+
         if (t.getText() == "+")
-            return evaluateExpression(*(expr.children[0])) +
-                   evaluateExpression(*(expr.children[1]));
+            return evaluateExpression(lhs) +
+                   evaluateExpression(rhs);
         else if (t.getText() == "-")
-            return evaluateExpression(*(expr.children[0])) -
-                   evaluateExpression(*(expr.children[1]));
+            return evaluateExpression(lhs) -
+                   evaluateExpression(rhs);
         else if (t.getText() == "/")
-            return evaluateExpression(*(expr.children[0])) /
-                   evaluateExpression(*(expr.children[1]));
+            return evaluateExpression(lhs) /
+                   evaluateExpression(rhs);
         else if (t.getText() == "%")
-            return evaluateExpression(*(expr.children[0])) %
-                   evaluateExpression(*(expr.children[1]));
+            return evaluateExpression(lhs) %
+                   evaluateExpression(rhs);
 
     }
     else if (t.getType() == TokenType::NUMBER)
@@ -86,7 +154,6 @@ int CodeGenerator::evaluateExpression(const Node &expr)
 
             if(ret.valueType == TokenValueType::STRING)
             {
-                //std::cout<<"STRING "<<ret.str;
                 return false;
             }
             else if(ret.valueType == TokenValueType::INTEGER)
@@ -99,6 +166,7 @@ int CodeGenerator::evaluateExpression(const Node &expr)
                 //std::cout<<"BOOLEAN "<<ret.boolean;
                 return ret.boolean;
             }
+
         }
 
 

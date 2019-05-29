@@ -88,6 +88,19 @@ Token Scanner::extractToken()
         if (isblank(source.getCurr()))
             skipWhite();
 
+        //token text
+        if (source.getCurr() == '\"')
+        {
+            source.getNextChar();
+            std::string txt = "";
+            while(source.getCurr() != '\"'){
+                txt+=source.getCurr();
+                source.getNextChar();
+            }
+            source.getNextChar();
+            return Token(TokenType::TEMPLATE_TEXT, txt);
+        }
+
         //brace
         if (source.getCurr() == '(')
         {
@@ -303,6 +316,7 @@ Scanner::Scanner(Source &source_) : firstChar{true},
     typeNames.emplace(std::make_pair(TokenType::OPBRACKET, "OPBRACKET"));
     typeNames.emplace(std::make_pair(TokenType::TEXT, "TEXT"));
     typeNames.emplace(std::make_pair(TokenType::TYPE, "TYPE"));
+    typeNames.emplace(std::make_pair(TokenType::TEMPLATE_TEXT, "TEMPLATE_TEXT"));
 }
 
 Scanner::~Scanner() = default;

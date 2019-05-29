@@ -19,12 +19,13 @@ public:
 
     void generate(const Node &root);
 
-    int evaluateExpression(const Node &expr);
+    int evaluateExpression(const Node &expr) const;
 
 private:
     std::unordered_map<std::string, TokenValue> symbols;
     JsonDeserializer jd;
     void printTokenValue(const TokenValue& t) const;
+    bool evaluateStringComparison(const Node& lhs, const Node& rhs, const Token& t) const;
 };
 
 
