@@ -1,4 +1,5 @@
 #include <iostream>
+#include <fstream>
 
 #include "json.h"
 #include "Source.h"
@@ -9,17 +10,19 @@
 
 using json = nlohmann::json;
 
-int main()
+int main(int argc, char* argv[])
 {
-    Source src("../a.txt");
-    std::ifstream fs("../data.json");
+    if(argc != 3){
+        std::cout<<"Usage: tgen JSONFILE INFILE";
+    }
+
+    Source src(argv[2]);
+    std::ifstream fs(argv[1]);
+    if(!fs)
+        std::cout<<"Problem reading json file" <<argv[1];
     json j_data;
     fs >> j_data;
 
-    JsonDeserializer deserializer(j_data);
-    std::cout << deserializer.getValueFromString("happy").boolean;
-    std::cout << deserializer.getValueFromString("answer.everything").integer;
-    std::cout << deserializer.getValueFromString("name").str;
 
     Scanner scanner(src);
     Parser parser(scanner);
@@ -27,9 +30,6 @@ int main()
     std::unique_ptr<Node> root = parser.root();
 
     generator.generate(*root);
-
-    if(root->children.empty())
-        return 1;
 
     return 0;
 }

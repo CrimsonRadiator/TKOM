@@ -2,6 +2,7 @@
 
 #include <sstream>
 #include <iostream>
+#include "Logger.h"
 
 TokenValue JsonDeserializer::jsonToTokenValue(const json& j) const {
     if(j.is_number_integer())
@@ -11,7 +12,8 @@ TokenValue JsonDeserializer::jsonToTokenValue(const json& j) const {
     if(j.is_string())
         return TokenValue(j.get<std::string>());
     //error
-    //TODO: Logger
+    Logger::getInstance().logBadJson(j.dump());
+
     return TokenValue(false);
 }
 
@@ -28,7 +30,7 @@ json JsonDeserializer::getJsonFromString(const std::string &str) const
         {
             if (!j.contains(object_string))
             {
-                //TODO: Logger
+                Logger::getInstance().logBadJson(j.dump());
                 return json();
             }
             j = j[object_string];
@@ -48,7 +50,7 @@ json JsonDeserializer::getJsonFromString(const std::string &str) const
 
             if (it == str.end())
             {
-                //TODO: out of range check, type check
+                Logger::getInstance().logBadJson(j.dump());
                 return j[object_string];
             }
 
@@ -62,7 +64,7 @@ json JsonDeserializer::getJsonFromString(const std::string &str) const
             {
                 if (!j.contains(object_string))
                 {
-                    //TODO: Logger
+                    Logger::getInstance().logBadJson(j.dump());
                     return json();
                 }
                 //TODO:: type check
@@ -71,7 +73,7 @@ json JsonDeserializer::getJsonFromString(const std::string &str) const
 
             if (!j.contains(object_string))
             {
-                //TODO: Logger
+                Logger::getInstance().logBadJson(j.dump());
                 return json();
             }
             j = j[object_string];
@@ -85,7 +87,7 @@ json JsonDeserializer::getJsonFromString(const std::string &str) const
     }
     if (!j.contains(object_string))
     {
-        //TODO: Logger
+        Logger::getInstance().logBadJson(j.dump());
         return json();
     }
     //TODO:: type check;

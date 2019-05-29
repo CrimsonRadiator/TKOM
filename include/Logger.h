@@ -28,7 +28,7 @@ public:
 
     void logParserFailure(unsigned int) const;
 
-    void logUndefinedSymbol(const Token &t) const;
+    void logBadJson(const std::string& str) const;
 };
 
 

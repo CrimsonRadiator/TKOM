@@ -43,7 +43,6 @@ enum class TokenValueType{
 };
 
 struct TokenValue{
-    //TODO: assign constructor
 
     TokenValue() = default;
 
@@ -62,7 +61,6 @@ struct TokenValue{
 
     TokenValue& operator = (const TokenValue &tv){
         if(this!=&tv){
-            //TODO: maybe checks?
             valueType = tv.valueType;
             str = tv.str;
             integer = tv.integer;
@@ -141,7 +139,6 @@ public:
     }
 
 private:
-    //TODO: Mutable?
     TokenType type;
     TokenValue value;
 };

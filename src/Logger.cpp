@@ -18,7 +18,8 @@ void Logger::logParserFailure(unsigned int line) const
     std::cout << "Parser failure at line: " << line << std::endl;
 }
 
-void Logger::logUndefinedSymbol(const Token &t) const
+void Logger::logBadJson(const std::string& str) const
 {
-    std::cout << "Undefined symbol " << t.getText() << std::endl;
+    std::cout << "Json parser problem with: " << str<< std::endl;
 }
+
