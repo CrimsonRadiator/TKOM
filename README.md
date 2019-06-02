@@ -19,10 +19,10 @@ make tkom_tests
 ```
 ## Usage
 ```
-./tgen JSONFILE INFILE
+./tgen INFILE [JSONFILE]
 ```
-Where JSONFILE is file with json data, and INFILE is input file. Output is returned as STDOUT, so to generate output file use:
+Where JSONFILE is optional file with json data, and INFILE is input file. Output is returned as STDOUT, so to generate output file use:
 ```
-./tgen JSONFILE INFILE > OUTFILE
+./tgen INFILE [JSONFILE] > OUTFILE
 ```
 Where OUTFILE is filename of output file.
