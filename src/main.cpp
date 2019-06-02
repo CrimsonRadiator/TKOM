@@ -12,16 +12,25 @@ using json = nlohmann::json;
 
 int main(int argc, char* argv[])
 {
-    if(argc != 3){
-        std::cout<<"Usage: tgen JSONFILE INFILE";
+
+    json j_data;
+    if(argc == 3)
+    {
+        std::ifstream fs(argv[2]);
+        if(!fs)
+        {
+            std::cout << "Problem reading json file" << argv[2];
+            return 2;
+        }
+        fs >> j_data;
+    }
+    else if(argc != 2)
+    {
+        std::cout<<"Usage: tgen INFILE JSONFILE";
+        return 1;
     }
 
-    Source src(argv[2]);
-    std::ifstream fs(argv[1]);
-    if(!fs)
-        std::cout<<"Problem reading json file" <<argv[1];
-    json j_data;
-    fs >> j_data;
+    Source src(argv[1]);
 
 
     Scanner scanner(src);
